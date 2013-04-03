@@ -35,6 +35,7 @@
 #include <glibmm/i18n.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/threads.h>
+#include <gtkmm/accelgroup.h>
 #include <gtkmm/icontheme.h>
 #include <gtkmm/image.h>
 #include <gtkmm/label.h>
@@ -53,7 +54,40 @@
 namespace gnote {
   namespace utils {
 
+    std::string get_sharedir()
+    {
+      const char *runtime_sharedir;
+      static char retval[PATH_MAX];
+
+      runtime_sharedir = getenv ("GNOTE_SHAREDIR");
+
+      if (!runtime_sharedir) {
+         strncpy (retval, DATADIR"", PATH_MAX - 1);
+         return retval;
+      }
+
+      strncpy (retval, runtime_sharedir, PATH_MAX - 1);
+      return retval;
+    }
+
+    std::string get_libdir()
+    {
+      const char *runtime_libdir;
+      static char retval[PATH_MAX];
+
+      runtime_libdir = getenv ("GNOTE_LIBDIR");
+
+      if (!runtime_libdir) {
+         strncpy (retval, DATADIR"", PATH_MAX - 1);
+         return retval;
+      }
+
+      strncpy (retval, runtime_libdir, PATH_MAX - 1);
+      return retval;
+    }
+
     namespace {
+
       void get_menu_position (Gtk::Menu * menu,
                               int & x,
                               int & y,
@@ -294,6 +328,29 @@ namespace gnote {
       m_fake_menu.append (*foo);
     }
 
+/*
+    void GlobalKeybinder::add_accelerator2(const sigc::slot<void> & handler, const std::string & accelerator,
+                                          Gtk::AccelFlags flags)
+    {
+
+      guint accel_key;
+      Gdk::ModifierType modifiers;
+
+      Gtk::AccelGroup::parse (accelerator, accel_key, modifiers);
+
+      Gtk::MenuItem *foo = manage(new Gtk::MenuItem ());
+      foo->signal_activate().connect(handler);
+      foo->add_accelerator ("activate",
+                          m_accel_group,
+                          accel_key,
+                          modifiers,
+                          flags);
+      foo->show ();
+
+      m_fake_menu.append (*foo);
+
+    }
+*/
 
     HIGMessageDialog::HIGMessageDialog(Gtk::Window *parent,
                                        GtkDialogFlags flags, Gtk::MessageType msg_type, 

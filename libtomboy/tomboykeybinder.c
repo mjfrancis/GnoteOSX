@@ -22,11 +22,15 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
+#include <config.h>
+
 #include <string.h>
 
 #include <gdk/gdk.h>
+#ifndef PLATFORM_OSX
 #include <gdk/gdkx.h>
 #include <X11/Xlib.h>
+#endif
 
 #include "eggaccelerators.h"
 #include "tomboykeybinder.h"
@@ -75,6 +79,7 @@ grab_ungrab_with_ignorable_modifiers (GdkWindow *rootwin,
 				      Binding   *binding,
 				      gboolean   grab)
 {
+#ifndef PLATFORM_OSX
 	guint mod_masks [] = {
 		0, /* modifier only */
 		num_lock_mask,
@@ -103,11 +108,15 @@ grab_ungrab_with_ignorable_modifiers (GdkWindow *rootwin,
 				    GDK_WINDOW_XID (rootwin));
 		}
 	}
+#endif
 }
 
 static gboolean 
 do_grab_key (Binding *binding)
 {
+#ifdef PLATFORM_OSX
+	return FALSE;
+#else
 	GdkKeymap *keymap = gdk_keymap_get_default ();
 	GdkWindow *rootwin = gdk_get_default_root_window ();
 
@@ -151,6 +160,7 @@ do_grab_key (Binding *binding)
 	}
 
 	return TRUE;
+#endif
 }
 
 static gboolean 
@@ -167,6 +177,7 @@ do_ungrab_key (Binding *binding)
 	return TRUE;
 }
 
+#ifndef PLATFORM_OSX
 static GdkFilterReturn
 filter_func (GdkXEvent *gdk_xevent, GdkEvent *event, gpointer data)
 {
@@ -217,6 +228,7 @@ filter_func (GdkXEvent *gdk_xevent, GdkEvent *event, gpointer data)
 
 	return return_val;
 }
+#endif
 
 static void 
 keymap_changed (GdkKeymap *map)
@@ -242,6 +254,7 @@ keymap_changed (GdkKeymap *map)
 void 
 tomboy_keybinder_init (void)
 {
+#ifndef PLATFORM_OSX
 	GdkKeymap *keymap = gdk_keymap_get_default ();
 	GdkWindow *rootwin = gdk_get_default_root_window ();
 
@@ -255,6 +268,7 @@ tomboy_keybinder_init (void)
 			  "keys_changed",
 			  G_CALLBACK (keymap_changed),
 			  NULL);
+#endif
 }
 
 void 
@@ -310,6 +324,9 @@ tomboy_keybinder_unbind (const char           *keystring,
 gboolean
 tomboy_keybinder_is_modifier (guint keycode)
 {
+#ifdef PLATFORM_OSX
+	return FALSE;
+#else
 	gint i;
 	gint map_size;
 	XModifierKeymap *mod_keymap;
@@ -332,6 +349,7 @@ tomboy_keybinder_is_modifier (guint keycode)
 	XFreeModifiermap (mod_keymap);
 
 	return retval;
+#endif
 }
 
 guint32

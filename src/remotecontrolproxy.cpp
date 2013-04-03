@@ -27,6 +27,7 @@
 #include "dbus/remotecontrol.hpp"
 #include "dbus/remotecontrolclient.hpp"
 #include "remotecontrolproxy.hpp"
+#include "utils.hpp"
 
 
 namespace gnote {
@@ -117,7 +118,7 @@ void RemoteControlProxy::load_introspection_xml()
   if(s_gnote_interface != 0) {
     return;
   }
-  std::ifstream fin(DATADIR"/gnote/gnote-introspect.xml");
+  std::ifstream fin((utils::get_sharedir() + "/gnote/gnote-introspect.xml").c_str());
   if(!fin) {
     return;
   }

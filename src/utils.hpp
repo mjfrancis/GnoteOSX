@@ -48,6 +48,9 @@ namespace sharp {
 namespace gnote {
   namespace utils {
 
+    std::string get_sharedir();
+    std::string get_libdir();
+
     void popup_menu(Gtk::Menu &menu, const GdkEventButton *);
 
     void show_help(const std::string & filename, const std::string & link_id,
@@ -73,7 +76,11 @@ namespace gnote {
 
       void add_accelerator(const sigc::slot<void> & , guint, Gdk::ModifierType, 
                            Gtk::AccelFlags);
-      
+/*
+      void add_accelerator2(const sigc::slot<void> &, const std::string &,
+                            Gtk::AccelFlags);
+*/
+
     private:
       Glib::RefPtr<Gtk::AccelGroup> m_accel_group;
       Gtk::Menu m_fake_menu;

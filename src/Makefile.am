@@ -165,5 +165,4 @@ gnote_SOURCES = \
 
 gnote_LDADD = \
 	$(GNOTE_LIBS) \
-	-lX11 \
 	$(NULL)

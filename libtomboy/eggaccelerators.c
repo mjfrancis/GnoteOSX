@@ -18,10 +18,14 @@
  * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA 
  */
 
+#include <config.h>
+
 #include "eggaccelerators.h"
 
 #include <string.h>
+#ifndef PLATFORM_OSX
 #include <gdk/gdkx.h>
+#endif
 #include <gdk/gdkkeysyms.h>
 
 enum
@@ -541,6 +545,8 @@ static void
 reload_modmap (GdkKeymap *keymap,
                EggModmap *modmap)
 {
+
+#ifndef PLATFORM_OSX
   XModifierKeymap *xmodmap;
   int map_size;
   int i;
@@ -621,6 +627,8 @@ reload_modmap (GdkKeymap *keymap,
   modmap->mapping[EGG_MODMAP_ENTRY_MOD5] |= EGG_VIRTUAL_MOD5_MASK;
   
   XFreeModifiermap (xmodmap);
+#endif
+
 }
 
 const EggModmap*

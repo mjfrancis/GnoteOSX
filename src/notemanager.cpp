@@ -23,6 +23,9 @@
 #include <config.h>
 #endif
 
+
+#include "sharp/uuid.hpp"
+
 #include <string.h>
 
 #include <exception>
@@ -45,7 +48,6 @@
 #include "sharp/directory.hpp"
 #include "sharp/exception.hpp"
 #include "sharp/files.hpp"
-#include "sharp/uuid.hpp"
 #include "sharp/string.hpp"
 #include "sharp/datetime.hpp"
 #include "notebooks/notebookmanager.hpp"

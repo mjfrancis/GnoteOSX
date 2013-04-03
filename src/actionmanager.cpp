@@ -66,6 +66,7 @@
 #include "debug.hpp"
 #include "actionmanager.hpp"
 #include "iconmanager.hpp"
+#include "utils.hpp"
 
 namespace gnote {
 
@@ -81,7 +82,7 @@ namespace gnote {
 
   void ActionManager::load_interface()
   {
-    Gtk::UIManager::ui_merge_id id = m_ui->add_ui_from_file(DATADIR"/gnote/UIManagerLayout.xml");
+    Gtk::UIManager::ui_merge_id id = m_ui->add_ui_from_file(utils::get_sharedir() + "/gnote/UIManagerLayout.xml");
     DBG_ASSERT(id, "merge failed");
     Gtk::Window::set_default_icon_name("gnote");
 

@@ -22,13 +22,19 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+#include <config.h>
+
 #include <gdk/gdk.h>
+#ifndef PLATFORM_OSX
 #include <gdk/gdkx.h>
+#endif
 #include <gtk/gtk.h>
+#ifndef PLATFORM_OSX
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#endif
 
-#include "config.h"
+
 #include "tomboykeybinder.h"
 #include "tomboyutil.h"
 
@@ -44,6 +50,9 @@
 gint
 tomboy_window_get_workspace (GtkWindow *window)
 {
+#ifdef PLATFORM_OSX
+	return -1;
+#else
 	GdkWindow *gdkwin = gtk_widget_get_window(GTK_WIDGET (window));
 	GdkAtom wm_desktop = gdk_atom_intern ("_NET_WM_DESKTOP", FALSE);
 	GdkAtom out_type;
@@ -66,11 +75,16 @@ tomboy_window_get_workspace (GtkWindow *window)
 	g_free (out_val);
 
 	return workspace;
+#endif
 }
+
 
 void
 tomboy_window_move_to_current_workspace (GtkWindow *window)
 {
+#ifdef PLATFORM_OSX
+	return;
+#else
 	GdkWindow *gdkwin = gtk_widget_get_window(GTK_WIDGET (window));
 	GdkWindow *rootwin = 
 		gdk_screen_get_root_window (gdk_window_get_screen (gdkwin));
@@ -119,11 +133,13 @@ tomboy_window_move_to_current_workspace (GtkWindow *window)
 		    False,
 		    SubstructureRedirectMask | SubstructureNotifyMask,
 		    &xev);
+#endif
 }
 
 static void
 tomboy_window_override_user_time (GtkWindow *window)
 {
+#ifndef PLATFORM_OSX
 	guint32 ev_time = gtk_get_current_event_time();
 
 	if (ev_time == 0) {
@@ -149,6 +165,7 @@ tomboy_window_override_user_time (GtkWindow *window)
 
 	TRACE (g_print("Setting _NET_WM_USER_TIME to: %d\n", ev_time));
 	gdk_x11_window_set_user_time (gtk_widget_get_window(GTK_WIDGET(window)), ev_time);
+#endif
 }
 
 void

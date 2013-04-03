@@ -11,7 +11,7 @@ DISTCLEANFILES = intltool-extract \
                  intltool-update \
                  po/.intltool-merge-cache
 
-SUBDIRS = data libtomboy src po help
+SUBDIRS = data libtomboy src po help osx
 
 DISTCHECK_CONFIGURE_FLAGS = --disable-schemas-install --disable-scrollkeeper --enable-applet
 

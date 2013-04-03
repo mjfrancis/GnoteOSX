@@ -39,7 +39,7 @@ namespace gnote {
 
 
 #define NUM_INDENT_BULLETS 3
-  const gunichar NoteBuffer::s_indent_bullets[NUM_INDENT_BULLETS] = { 0x2022, 0x2218, 0x2023 };
+  const gunichar NoteBuffer::s_indent_bullets[NUM_INDENT_BULLETS] = { 0x2022, 0x25E6, 0x2023 };
 
   bool NoteBuffer::is_bullet(gunichar c)
   {

@@ -212,7 +212,7 @@ sharp::XslTransform & ExportToHtmlNoteAddin::get_note_xsl()
     }
 
     s_xsl = new sharp::XslTransform;
-    std::string stylesheet_file = DATADIR "/gnote/" STYLESHEET_NAME;
+    std::string stylesheet_file = gnote::utils::get_sharedir() + "/gnote/" STYLESHEET_NAME;
 
     if (sharp::file_exists (stylesheet_file)) {
       DBG_OUT("ExportToHTML: Using user-custom %s file.", STYLESHEET_NAME);

@@ -62,9 +62,21 @@ LT_INIT([disable-static])
 AC_LANG_CPLUSPLUS
 AC_LANG_COMPILER_REQUIRE
 
+GTK_CHECK_BACKEND([quartz], [3.0], [os_osx=yes], [os_osx=no])
+if test "$os_osx" = "yes"; then
+        PKG_CHECK_MODULES(GTK_MAC, gtk-mac-integration)
+        AC_SUBST(GTK_MAC_LIBS)
+        AC_SUBST(GTK_MAC_CFLAGS)
+        AC_DEFINE([PLATFORM_OSX],[1],[Defined if platform is Mac OSX])
+fi
+AM_CONDITIONAL(OS_OSX, test "$os_osx" = "yes")
+
+if test "$os_osx" = "no"; then
+        PKG_CHECK_MODULES(X, [x11])
+fi
+
 PKG_CHECK_MODULES(LIBGLIBMM, [glibmm-2.4])
 PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= $GTK_VERSION])
-PKG_CHECK_MODULES(X, [x11])
 PKG_CHECK_MODULES(LIBGTKMM, [gtkmm-3.0 >= $LIBGTKMM_VERSION])
 # Check for glib 2.32 or higher, which have certain incompatibilities with older ones
 PKG_CHECK_EXISTS(glib-2.0 >= 2.32,
@@ -175,6 +187,8 @@ src/dbus/Makefile
 po/Makefile.in
 po/Makefile
 help/Makefile
+osx/Info.plist
+osx/Makefile
 ])
 
 

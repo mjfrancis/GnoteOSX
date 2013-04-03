@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
 
 #include <string.h>
 
@@ -40,6 +41,7 @@ namespace gnote {
 
     Glib::RefPtr<Gio::Settings> settings = Preferences::obj().get_schema_settings(Preferences::SCHEMA_GNOTE);
     //Set up the schema to watch the default document font
+#ifndef PLATFORM_OSX
     Glib::RefPtr<Gio::Settings> desktop_settings = Preferences::obj()
       .get_schema_settings(Preferences::SCHEMA_DESKTOP_GNOME_INTERFACE);
     if(desktop_settings) {
@@ -57,6 +59,7 @@ namespace gnote {
     }
 
     settings->signal_changed().connect(sigc::mem_fun(*this, &NoteEditor::on_font_setting_changed));
+#endif
 
     // Set extra editor drag targets supported (in addition
     // to the default TextView's various text formats)...
@@ -73,6 +76,7 @@ namespace gnote {
 
   Pango::FontDescription NoteEditor::get_gnome_document_font_description()
   {
+#ifndef PLATFORM_OSX
     try {
       Glib::RefPtr<Gio::Settings> desktop_settings = Preferences::obj()
         .get_schema_settings(Preferences::SCHEMA_DESKTOP_GNOME_INTERFACE);
@@ -85,6 +89,7 @@ namespace gnote {
     catch (...) {
 
     }
+#endif
 
     return Pango::FontDescription();
   }
