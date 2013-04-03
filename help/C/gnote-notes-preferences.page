@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<page xmlns="http://projectmallard.org/1.0/" xmlns:e="http://projectmallard.org/experimental/"
+      type="guide"
+      id="notes-preferences">
+
+
+  <info>
+    <link type="guide" xref="index#customizing"/>
+    <desc>Gnote Settings</desc>
+    <license><p>GNU Free Documentation License (GFDL), Version 1.1</p></license>
+    <credit type="author">
+      <name>Pierre-Yves Luyten</name>
+      <years>2011</years>
+    </credit>
+    <credit type="editor">
+      <name>Aurimas Cernius</name>
+      <years>2011-2012</years>
+    </credit>
+  </info>
+
+  <title>Gnote Preferences</title>
+  <section id="editing">
+    <title>General preferences</title>
+    <p>To set preferences for <app>Gnote</app>, select <gui>Preferences</gui> from the application menu.</p>
+    <p>There are three categories of preferences, <gui>General</gui>, <gui>Hotkeys</gui> and <gui>Add-Ins</gui>. Preferences for each tab will be described below.</p>
+    <p>The general tab will allow you to set preferences related to application behaviour and editing notes. There are few checkboxes on this tab, which can either be turned on or off.</p>
+    <list>
+      <item><title>Use Status Icon</title><p> Enable this checkbox to show <app>Gnote</app> status icon when running. In this mode <app>Gnote</app> will remain present even after all it's windows are closed. Recently used notes and other windows can be opened from menu, that appears after clicking or right-clicking status icon.</p></item>
+      <item><title>Spellcheck While Typing</title><p> Enable this checkbox to underline misspellings in red, and provide suggestions in the right click context menu.</p><p>The spellcheck option is only available if you have the GtkSpell package for your distribution installed.</p></item>
+      <item><title>Highlight WikiWords</title><p> Enable this checkbox to create links for phrases ThatLookLikeThis. Clicking on the link will create a new note with the title corresponding to the link text.</p></item>
+      <item><title>Enable auto-bulleted lists</title><p>Enable this checkbox, if you want create bulleted list by starting lines with dash character <key>-</key>. Read more about <link xref="bulleted-lists"/>.</p></item>
+      <item><title>Use Custom Font</title><p> Enable this checkbox to set a custom font to be used in your notes. If this option is disabled, the default system font will be used.</p></item>
+    </list>
+    <figure><title><gui>Preferences</gui> window</title>
+      <media type="image" src="figures/gnote-preferences-editing.png" mime="image/png" style="right"></media><desc>Editing Gnote Preferences</desc>
+    </figure>
+  </section>
+
+  <section id="advanced" style="2column">
+    <title>Advanced Settings</title>
+  </section>
+  <section id="sync">
+    <title>Synchronization Settings</title>
+    <section id="sync-addins" style="2column">
+      <title>Synchronization services</title>
+    </section>
+    <section id="sync-advanced">
+      <title>Advanced</title>
+      <p>Clicking <gui>Advanced</gui> button in <gui>Synchronization</gui> tab of <gui>Preferences</gui> dialog brings another dialog for setting up conflict resolution.</p>
+      <figure>
+        <title>Advanced Synchronization Settings</title>
+        <media type="image" src="figures/gnote-syncprefs-advanced.png" mime="image/png"/>
+      </figure>
+      <p>This dialog lets you choose what to do, when a conflict occurrs. A conflict happends, when the note is modified before synchronizing and it has been also modified on other device (and synchronized to synchronization storage). You can select one of these options:</p>
+      <list>
+        <item><title>Rename existing note by appending &quot;(old)&quot; to it's title and download the one from storage</title></item>
+        <item><title>Replace existing note by the one from storage, losing all modifications</title></item>
+        <item><title>Get the choice for each conflicting note individually</title></item>
+      </list>
+    </section>
+  </section>
+
+</page>

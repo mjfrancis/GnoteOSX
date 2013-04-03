@@ -1,0 +1,93 @@
+Gnote
+-----
+
+Gnote is a C++ port of Tomboy
+
+I wrote this as an experiment, and the emphasis has been put on making
+it a clone as close as possible to the original.
+
+http://live.gnome.org/Gnote
+
+Compiling
+---------
+
+See the INSTALL file.
+
+Dependencies:
+- Glibmm 2.28
+- Gtkmm 3.4
+- Gtk+ 3.0
+- libxml2
+- libxslt
+- libuuid
+- boost 1.34
+- libpcrepp (part of pcre)
+
+Importing Tomboy notes
+----------------------
+
+Upon first running Gnote, it will import Tomboy and eventually 
+StickyNote notes. These will be *copied*.
+
+It is deliberate that it does not share the storage with Tomboy.
+Note: due to the way Tomboy work, the "pinned" state of the notes 
+will not be carried over, not yet.
+
+Getting the code
+----------------
+
+The source tree is currently hosted on GNOME.
+To view the repository onlineL
+   http://git.gnome.org/cgit/gnote
+
+The URL to clone it:
+   git://git.gnome.org/gnote
+
+
+Reporting bug
+-------------
+
+Please report bugs into GNOME bugzilla:
+http://bugzilla.gnome.org/
+
+Translations
+------------
+
+If you have translated Gnote, please contact the corresponding team:
+
+http://l10n.gnome.org/teams/
+
+Mailing list
+------------
+
+There is a mailing list for gnote. More info here:
+http://mail.gnome.org/mailman/listinfo/gnote-list
+
+License
+-------
+
+This software in GPLv3 or later. See the file COPYING. Some files are
+under a different license. Check the headers for the copyright info.
+
+Authors:
+--------
+
+Aurimas Cernius <aurimasc@src.gnome.org>
+Debarshi Ray <debarshir@src.gnome.org>
+Hubert Figuiere <hub@figuiere.net>
+
+
+Original Tomboy authors and copyright:
+Copyright (C) 2004-2007 Alex Graveley <alex@beatniksoftware.com>
+
+Alex Graveley <alex@beatniksoftware.com>
+Boyd Timothy <btimothy@gmail.com>
+Chris Scobell <chris@thescobells.com>
+David Trowbridge <trowbrds@gmail.com>
+Ryan Lortie <desrt@desrt.ca>
+Sandy Armstrong <sanfordarmstrong@gmail.com>
+Sebastian Rittau <srittau@jroger.in-berlin.de>
+Kevin Kubasik <kevin@kubasik.net>
+Stefan Schweizer <steve.schweizer@gmail.com>
+Benjamin Podszun <benjamin.podszun@gmail.com>
+

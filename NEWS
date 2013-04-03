@@ -1,0 +1,1002 @@
+3.8.0 "We can predict everything, except the future" - 2013/03/24
+
+New Features:
+  * Updated manual
+  * Increase default width of main window
+
+Fixes:
+  * Fix crash on first run
+  * Make labels for delete actions translatable
+
+Translations:
+  * Updated translations:
+    - Assamese (as)
+    - Brazilian Portuguese (pt_BR)
+    - Czech (cs)
+    - Gujarati (gu)
+    - Hindi (hi)
+    - Hungarian (hu)
+    - Kannada (kn)
+    - Lithuanian (lt)
+    - Marathi (mr)
+    - Polish (pl)
+    - Serbian (sr, sr@latin)
+    - Slovenian (sl)
+    - Spanish (es)
+    - Tamil (ta)
+  * Updated Czech manual (cs)
+  * Updated Lithuanian manual (lt)
+
+3.7.3 - 2013/03/03
+
+New Features:
+  * Hide titlebar when maximized
+  * Require Gtkmm 3.6
+  * Use Gtk::SearchEntry for search entries
+  * Return spell check support (requires GtkSpell3)
+  * Redesing main window toolbar
+  * Ability for add-ins to add actions to main window search and note modes
+
+Fixes:
+  * Remove use of deprecated gdk_threads_* functions
+  * Fix ocasional crashes and hungs when launching syncronization
+  * Save main window pos and size on quit
+  * Fix opening notes via command line args
+  * Gnote silently discard/truncate data when disk is full (#627317)
+  * Fix export to HTML with XML special chars in title (#694935)
+
+Translations:
+  * Updated translations:
+    - Assamese (as)
+    - Brazilian Portuguese (pt_BR)
+    - Czech (cs)
+    - French (fr)
+    - Japanese (ja)
+    - Polish (pl)
+    - Punjabi (pa)
+    - Serbian (sr)
+    - Slovenian (sl)
+    - Spanish (es)
+  * Updated Czech manual (cs)
+  * Updated Spanish manual (es)
+
+3.7.2 - 2013/01/06
+
+New Features:
+  * Add automatic synchronization
+  * Updated manual
+
+Fixes:
+  * Fix remembered selection with replacing selected text
+  * Fix status icon for Xfce 4 (#666775)
+
+Translations:
+  * Updated translations:
+    - Arabic (ar)
+    - Assamese (as)
+    - Catalan (ca)
+    - Czech (cs)
+    - Galician (gl)
+    - Hungarian (hu)
+    - Kannada (kn)
+    - Lithuanian (lt)
+    - Polish (pl)
+    - Russian (ru)
+    - Slovenian (sl)
+    - Spanish (es)
+  * Updated Czech manual (cs)
+  * Updated Spanish manual (es)
+
+3.7.1 - 2012/12/08
+
+New Features:
+ * Add new special notebook PinnedNotesNotebook
+ * Add new special notebook Active Notes
+ * Replace switcher by search button in main window
+ * Add New Note button to main window toolbar (#657270)
+ * Add keywords to desktop file
+ * Change window title according to what's displayed
+
+Fixes:
+ * Fix segfaults when using tray menu (#688558)
+ * Fix Search All Notes tray menu item
+
+Translations:
+  * Updated translations:
+    - Assamese (as)
+    - Czech (cs)
+    - Galician (gl)
+    - Lithuanian (lt)
+    - Polish (pl)
+    - Serbian (sr)
+    - Slovenian (sl)
+    - Spanish (es)
+
+3.7.0 - 2012/11/03
+
+New Features:
+  * Show notes inside main window, do not use separate windows
+  * Make several main windows possible
+  * Add application menu (#675251)
+  * Save main window maximization state
+
+Fixes:
+  * Fix build on GCC 4.2 (#684931)
+  * Fix runtime warning with markup in fixed width addin
+
+Translations:
+  * Updated translations:
+    - Czech (cs)
+    - Galician (gl)
+    - German (de)
+    - Indonesian (id)
+    - Latvian (lv)
+    - Lithuanian (lt)
+    - Marathi (mr)
+    - Slovenian (sl)
+    - Spanish (es)
+  * Updated Spanish manual (es)
+
+3.6.0 "Good cooking takes time" - 2012/09/26
+
+New Features:
+ * WebDAV synchronization checks now time-out
+ * Port to new documentation infrastructure
+
+Fixes:
+ * Fix error in WebDAV manual
+ * Fix exit in status icon mode on close window
+
+Translations:
+  * Updated translations:
+    - Assamese (as)
+    - British English (en_GB)
+    - Czech (cs)
+    - Galician (gl)
+    - German (de)
+    - Hindi (hi)
+    - Hungarian (hu)
+    - Indonesian (id)
+    - Malayalam (ml)
+    - Marathi (mr)
+    - Polish (pl)
+    - Slovenian (sl)
+    - Spanish (es)
+  * Updated Lithuanian manual (lt)
+
+3.5.0 - 2012/08/25
+
+New Features:
+ * Added NoteDirectoryWatcher add-in (#583812)
+ * Droped dependency on libpcrecpp
+ * Migrated to libsecret, droped dependency on libgnome-keyring
+ * Updated documentation
+ * Switch to GNOME versioning scheme
+
+Fixes:
+ * Add check for X11 (#679496)
+ * Fixed FTBFS with Debian GNU/kFreeBSD (#681588)
+ * Make possible to disable synchronization addins
+ * Fixed memory leak in search window
+
+Translations:
+  * Updated translations:
+    - Arabic (ar)
+    - French (fr)
+    - German (de)
+    - Gujarati (gu)
+    - Hungarian (hu)
+    - Japanese (ja)
+    - Lithuanian (lt)
+    - Lithuanian manaul (lt)
+    - Punjabi (pa)
+    - Slovenian (sl)
+    - Spanish (es)
+    - Spanish manual (es)
+
+0.9.1 - 2012/07/02
+
+New Features:
+  * Gtkmm 3.4 is required
+  * Derived Search window from Gtk::ApplicationWindow
+  * Replace shave with automake's silent rules (#673710)
+  * Added 256x256 app icon (#674267)
+  * Added log to file capability in debug mode
+  * Added gnome-keyring dependency
+  * Added WebDAV synchronization
+  * Droped support for panel applet
+  * Migrated to Gtk::Application
+
+Fixes:
+  * Fix quit application for glib >= 2.32 (#670104)
+  * Removed use of deprecated GtkStyle (#667395)
+  * Fixed missing include for Glibmm 2.32 (#671787)
+  * Fixed multiple compiler warnings
+  * Fix bullet indentation when printing (#674904)
+
+Translations:
+  * Updated translations:
+    - Arabic (ar)
+    - Brazilian Portuguese (pt_BR)
+    - Czech (cs)
+    - French (fr)
+    - Galician (gl)
+    - Gujarati (gu)
+    - Hungarian (hu)
+    - Indonesian (id)
+    - Latvian (lv)
+    - Lithuanian (lt)
+    - Punjabi (pa)
+    - Simplified Chinese (zh_CN)
+    - Slovenian (sl)
+    - Spanish (es)
+    - Swedish (sv)
+    - Ukranian (uk)
+
+0.9.0 - 2012/03/10
+
+New Features:
+  * Added core synchronization support
+  * Added addin to synchronize with local folder.
+
+Fixes:
+  * Fix missing header for Glib::signal_idle (#667349)
+  * Call startup defined in GApplication
+  * Remove mnemonic references in documentation (#670916)
+  * Fix selection deletion and remembering it
+  * Fix quit application for glib >= 2.32
+
+Translations:
+  * Updated translations:
+    - Czech (cs)
+    - Danish (da)
+    - French (fr)
+    - French manual (fr)
+    - Galician (gl)
+    - German (de)
+    - German manual (de)
+    - Japanese (ja)
+    - Lithuanian (lt)
+    - Lithuanian manual (lt)
+    - Norwegian Bokmål (nb)
+    - Slovenian (sl)
+    - Spanish (es)
+    - Spanish manual (es)
+  * Added Slovenian manual (sl)
+
+0.8.2 "Lil' early XMas gift" - 2011/12/19
+
+New Features:
+  * Added template bar to template notes
+  * Integrated with GtkApplication (#640430)
+  * Gnote remains present while at least one window is present
+  * Panel applet disabled by default
+  * Added option for status icon to preferences (#663817)
+  * Added background mode
+  * Return ordered note list when using D-BUS search (#662246)
+
+Fixes:
+  * Fixed keys in GSettings schema descriptions
+  * Manual fixes
+  * Updated man page to current behaviour
+  * Do not open Search Window in status icon mode (#653447)
+  * Fixed special XML character encoding
+  * Make sticky note importer support special chars
+  * Show in all desktop environements (#664609)
+  * src/notetag.hpp must include <map> (#655340)
+  * Add missing includes (#665344)
+  * Fixed a warning about a condition never reached
+  * Fixed note deletion with international characters
+
+Translations:
+  * Updated translations:
+    - British English (en_GB)
+    - Catalan (ca)
+    - Czech (cs)
+    - Esperanto (eo)
+    - French (fr)
+    - German (de)
+    - Hungarian (hu)
+    - Lithuanian (lt)
+    - Polish (pl)
+    - Punjabi (pa)
+    - Russian (ru)
+    - Slovenian (sl)
+    - Spanish (es)
+    - Swedish (sv)
+
+0.8.1 "Dennis Ritchie" - 2011/10/23
+
+New features:
+  * Removed case-sensitive search from Search All Notes window
+  * Focus chain for Search All Notes
+  * Optimized note creation, renaming and deletion (#660653, #660663)
+  * Search in notebook suggests to search all notes, when there are no matches
+
+Fixes:
+  * Open note action availability
+  * Program name in about dialog
+  * Help for --start-here
+  * Don't change content modification time when autolinking
+  * Link not created when linking to existing note
+  * Broken link activation does not make link normal
+  * GetNoteContents D-Bus API returns wrong text for notes not displayed (#647888)
+  * Case-insensitive search via SearchNotes D-Bus API (#662426)
+  * Added -Wformat-security to compilation flags (#662490)
+
+Translations:
+  * Updated translation:
+    - Czech (cs)
+    - Danish (da)
+    - French (fr)
+    - German (de)
+    - Hungarian (hu)
+    - Indonesian (id)
+    - Japanese (ja)
+    - Latvian (lv)
+    - Lithuanian (lt)
+    - Polish (pl)
+    - Russian (ru)
+    - Slovenian (sl)
+    - Spanish (es)
+    - Swedish (sv)
+    - Ukranian (uk)
+  * Added translations:
+    - Turkish (tr)
+  * Added Danish (da) manual
+  * Added Lithuanian (lt) manual
+
+0.8.0 "We believe in GNOME 3" - 2011/09/24
+
+New features:
+
+  * Ported to GTK 3.0
+  * New documentation in Mallard format
+  * Handle x-scheme-handler/note mime-type
+  * Use pkg-config for uuid (#649486)
+  * Build only shared libraries for addins (#620015)
+  * Search window context menus rework (#601852)
+  * Disabled GtkSpell
+  * Ported panel applet to libpanelapplet-4 (#639779)
+  * Ported configuration to Gio::Settings
+  * Status icon presence is now configurable
+  * About dialog is now a child of Search All Notes
+  * Added replace title addin (#639938)
+  * Changed search to prioritize note titles
+  * Ported D-Bus support to Gio::DBus (also fixes #618330)
+  * Open all selected notes
+  * Show note title when deleting only 1 note
+  * Removed minimum size on Search All Notes Window
+  * Set min width of note title column to 150
+
+Fixes:
+
+  * Place user local addins in addins subdirectory (#619867)
+  * Change tomboyimport according recent Tomboy
+  * Import sticky notes when Tomboy is not installed (#605382)
+  * Use actual visibility of status icon (#650001)
+  * Fix dragging notes to Unfiled notes (#655208)
+  * Fix command line option --new-note with argument
+  * Fix delete key behaviour in bulleted list
+  * Don't create nested links
+
+Translations:
+
+  * Updated translations:
+    - Brazilian Portuguese (pt_BR)
+    - Czech (cs)
+    - French (fr)
+    - German (de)
+    - Hebrew (he)
+    - Hungarian (hu)
+    - Lithuanian (lt)
+    - Polish (pl)
+    - Russian (ru)
+    - Slovenian (sl)
+    - Spanish (es)
+  * Added translations:
+    - Czech documentation (cs)
+    - French (fr)
+    - German documentation (de)
+    - Latvian (lv)
+    - Ukranian (uk)
+    - Serbian (sr)
+
+0.7.5 "Little things matter" - 2011/07/30
+
+New features:
+
+  * If Search All Notes dialog is shown, make about dialog a child of it
+  * Show search window when launching
+  * Improved Search All Notes context menus (#601852)
+
+Fixes:
+
+  * When dragging notes to Unfiled notes, the note view is not updated (#655208)
+  * When closing Search All Notes dialog, use actual visibility of status icon (#650001)
+  * Remove usage of GConf and depending on Tomboy, when importing sticky notes (#605382)
+  * Change tomboyimport according recent Tomboy
+  * Fix build on FreeBSD and OpenBSD (#649478, #649481, #649472)
+
+Translations:
+
+  * Updated translations:
+    - Czech (cs)
+    - Hungarian (hu)
+    - Japanese (ja)
+    - Portuguese Brazil (pt_BR)
+    - Russian (ru)
+
+0.7.4 "The 80 YO Mr.Spock" - 2011/04/30
+
+New features:
+
+  * Show addin categories and versions in addin preferences tab (#620402)
+  * Implemented notebook rename (#610194)
+  * Drop dependency on Boost filesystem (#641416)
+  * Require Glibmm  2.18 or newer
+
+Fixes:
+
+  * Do not crash when $XDG_DATA_HOME is absent, create configuration directories as S_IRWXU (#631408)
+  * Fix documentation for creating notebook (#633976)
+  * Instance save addin preferences (#637051)
+  * Use only icons of certain size in tray (#594932)
+  * Do not lose notebook using notebook toolbar button (#585048)
+  * Fix --highlight-search with non-uri --open-note (#608713)
+  * Fix paste of URL part (#633951)
+  * Fix paste of link part (#634026)
+  * Fix template note rename (#627539)
+  * Fix redo with multiline paste and bullets (#588098)
+  * Fix undo with multibyte characters (#641545)
+  * Backlinks doesn't work with newer versions libxml (#638321)
+  * Select new note body selection whith default content (#627073)
+  * Select new notebook note body selection whith default content (#627075)
+  * Fix template note selection on creation (#627418)
+  * Fix notebook template note selection on create (#627417)
+  * Upgrade to newer boost.m4
+  * Add missing #include <config.h> to make translations work (#646051)
+  * Some GTK 3 compilation fixes (without affect to dependencies and behaviour)
+
+Translations:
+
+  * Updated translations:
+    - Arabic (ar)
+    - British English (en_GB)
+    - Catalan (ca)
+    - Czech (cs)
+    - Danish (da)
+    - French (fr)
+    - German (de)
+    - Hebrew (he)
+    - Hungarian (hu)
+    - Korean (ko)
+    - Lithuanian (lt)
+    - Polish (pl)
+    - Portuguese Brazil (pt_BR)
+    - Simplified Chinese (zh_CN)
+    - Slovenian (sl)
+    - Spanish (es)
+    - Swedish (sv)
+
+0.7.3 "It is not the age but the base that changes" - 2010/11/04
+
+Fixes:
+
+* 588537 - Keywords don't become clickable links when part of a list
+* 606022 - Special characters within titles prevent clickable links
+* 606492 - Alt+Right to enable bullets, not Alt+Left
+* 608311 - Auto-selection of newly created note's contents is broken in
+           multi-byte language
+* 609120 - Use MESSAGE_INFO for export dialog confirmation icon
+* 610406 - Make sharp::string_to_lowercase() and sharp::string_substring
+           Unicode aware
+* 611731 - Disabled plugins are enabled after restarting Gnote
+* 620013 - Remove lib prefix from "Note of the day" addin
+* 626624 - Notebook sorting not ok under notebook button
+* 627419 - Allow to delete notebook template note
+* 631572 - Fix build with GTK+ 2.22
+* 633217 - Fix selection with bulleted list and end key
+
+Translations:
+
+* Updated translations:
+  - Bengali India (bn_IN)
+  - Brazilian Portugese (pt_BR)
+  - Catalan Valencia (ca@valencia)
+  - French (fr)
+  - Gujrati (gu)
+  - Hebrew (he)
+  - Hungarian (hu)
+  - Hindi (hi)
+  - Indonesian (id)
+  - Italian (it)
+  - Japanese (ja)
+  - Kannada (kn)
+  - Korean (ko)
+  - Lithuanian (lt)
+  - Malayalam (ml)
+  - Marathi (mr)
+  - Oriya (or)
+  - Punjabi (pa)
+  - Romanian (ro)
+  - Russian (ru)
+  - Simplified Chinese (zh_CN)
+  - Swedish (sv)
+  - Thai (th)
+* Added translations:
+  - Norwegian Bokmål (nb)
+  - Slovenian (sl)
+  - Ukrainian (uk)
+
+0.7.2 "Thursdays should not be free" - 2010/03/12
+
+New Features:
+
+* 551097 - Search for phrases
+* 584789 - Allow user to decide if links are updated when renaming a note
+
+Fixes:
+
+* 603925 - Fix boost.m4 to work with Autoconf >= 2.64
+* 609864 - Fix implicit linking
+
+Translations:
+
+* Updated translations:
+  - Arabic (ar)
+  - Bengali India (bn_IN)
+  - Chinese Simplified (zh_CN)
+  - Czech (cs)
+  - German (de)
+  - Lithuanian (lt)
+  - Oriya (or)
+  - Polish (pl)
+  - Slovenian (sl)
+  - Spanish (es)
+  - Swedish (sv)
+  - Telegu (te)
+  - Thai (th)
+* Added translations:
+  - Hindi (hi)
+  - Malayalam (ml)
+
+0.7.1 "Can hear the heater whirring" - 2010/01/04
+
+New Features:
+
+* 604779 - Right click to change active row in search window
+
+Fixes:
+
+* 592937 - URLs starting with ~ can not be opened (eg., ~/Music)
+* 597942 - _Previous and _Next accelerators not working
+* 598045 - Repeated Find Previous does not work
+* 601459 - Open context menu with keyboard key
+* 602493 - Double context menu
+* 605864 - Note of the day template shouldn't be translatable
+* 605869 - NoteOfTheDay addin causes crash with unhandled exception
+           (type std::exception) in signal handler
+
+Translations:
+
+* Updated translations:
+  - Arabic (ar)
+  - Slovenian (sl)
+
+0.7.0 "The end is near" - 2009/12/31
+
+New Features:
+
+* 590589 - Add a Note of the Day addin
+
+Fixes:
+
+* 579359 - XDG directory spec conformance
+* 597307 - Addins can't be disabled
+* 604367 - Bugzilla addin doesn't work
+
+Translations:
+
+* Updated translations:
+  - Arabic (ar)
+  - Spanish (es)
+  - Portuguese Brazil (pt_BR)
+* Added translations:
+  - Bulgarian (bg)
+  - Danish (da)
+
+0.6.3 "The days are short" - 2009/11/28
+
+Fixes:
+
+* 586541 - Crashes on hitting enter twice before URLs
+* 596138 - Better tooltip for panel applet
+
+Translations:
+
+* Updated translations:
+  - Bengali India (bn_IN)
+  - Chinese Simplified (zh_CN)
+  - French (fr)
+  - German (de)
+  - Italian (it)
+  - Kannada (kn)
+  - Punjabi (pa)
+  - Russian (ru)
+  - Swedish (sv)
+  - Tamil (ta)
+  - Telugu (te)
+  - Thai (th)
+* Added translations:
+  - Galician (gl)
+  - Indonesian (id)
+  - Oriya (or)
+  - Polish (pl)
+  - Portuguese Brazil (pt_BR)
+  - Slovenian (sl)
+
+0.6.2 - 2009/08/12
+
+Fixes:
+
+  * Fix configure failure with --disable-dbus. (Closes #590560) (Gilles 
+    Dartiguelongue)
+  * Use mnemonic/underlines on the toolbar buttons. (Closes #590590)
+
+Translations:
+
+  * Updated translations:
+    - Spanish (es)
+
+
+0.6.1 "Bonobo Must Die" - 2009/07/31
+
+Fixes:
+
+  * Unbreak the applet support. (Closes #590346)
+
+0.6.0 "We believe in D-Bus" - 2009/07/29
+
+New Features:
+
+  * Implement org.gnome.Gnote.RemoteControl to mimic Tomboy DBus API.
+    (Closes #581030)
+  * Prevent starting a second Gnote using DBus. (Closes #585773)
+  * Support --new-note. (Closes #585774)
+  * Support --open-note with a URL. (Close #585775)
+  * Underline addin.
+  * Add a shortcut for the Fixed Width and make mnemonic consistent.
+    (Tomboy bug #418964 and Tomboy bug #357426)
+  * Allow to hide the Find bar with ESC. (Tomboy bug #540822)
+  * Save the splitter position for the search window (Tomboy bug #563744).
+  * Add menu items for increasing and decreasing the font size. 
+    (Tomboy bug #488822)
+
+Fixes:
+
+  * Fixes a potential problem with tags when reading a note.
+  * Add COPYING-DOCS. (Closes #582381)
+  * Fix build on non-Linux systems: add boot system lib, don't pass 
+    linker flags with -Wl, link libtomboy directly. (Closes #587228) 
+    (Closes #587261) (Closes #587262)
+  * Make naming consistent: it is Gnote, not Gnote Notes. (Closes #587644)
+  * Fixed some internal inconsistencies with the "TagTable" that is now
+    shared.
+  * Don't save the notes needlessly. (Closes #586594)
+  * Speedup in Note::load_foreign_note_xml() to avoid flooding with 
+    unneeded notifications.
+  * Fix print formatting issues. (Tomboy bug #572024)
+  * Update copyright from Tomboy.
+  * Use a button for "Open New Note Template". (Tomboy bug #581582).
+  * Avoid a lookup for the TextTag when loading addins.
+  * Display first bullet in HTML export (Tomboy bug #422954)
+  * Change the Find bar to match the rest of GNOME. (Tomboy Bug #483297)
+  * Remove exclusion list for prefixes in WikiWords (Tomboy Bug #392627)
+  * Use a status bar in the "Search All Notes" and add a resize grip
+    at the same time (Tomboy bug #500513)
+  * Allow drag and select within links by activating only with button
+    release. (Tomboy bug #414029).
+  * Prevent activation of links that have just been middle-click pasted 
+    to a note. (Tomboy bug #414029) 
+  * Change the icon AddinInfoDialog to use the stock DIALOG_INFO. 
+    (Tomboy bug #508844)
+  * Ensure the notebook button has a label in the mode "icon + text on
+    the side".
+
+Translations:
+
+  * Updated translations:
+    - Arabic (ar)
+    - German (de)
+    - Russian (ru)
+    - Simplified Chinese (zh_CN)
+    - Spanish (es)
+
+  * Added translations:
+    - Hebrew (he)
+
+0.5.3 "Bastille Day" - 2009/07/14
+
+Fixes:
+
+  * Use a sane default location when printing to file. (Closes #587245)
+  * Fix a typo causing 4 soft line-breaks to insert instead of 1.
+  * Fix a crash when requesting help in the "Search All" in applet mode.
+    (Closes #588489)
+
+Translations:
+
+  * Updated translations:
+    - Gujarati (gu)
+    - Japanese (ja)
+    - Swedish (sv)
+    - Thai (th)
+
+  * Added translations:
+    - Lithuanian (lt)
+    - Korean (ko)
+    - Telugu (te)
+    - Simplified Chinese (zh_CN)
+
+0.5.2 "Canada day" - 2009/07/01
+
+Fixes:
+
+  * Avoid a crash in a race condition when deleting a note. (Closes #587395)
+  * Fix a leak with libxml2 usage once in the lifetime.
+  * Free the import addins at the end.
+  * Can now delete several notes in the list at once. (Closes #587350)
+  * List were broken when not in ASCII. (Closes #587070 and dupes)
+  * Prevent a crash in the destruction chain NoteWindow (Closes #586084)
+  * Remove the synchronisation menu item until Sync is implemented 
+    (Closes #585610)
+
+Translations:
+
+  * Updated translations:
+    - Arabic (ar)
+
+0.5.1 - 2009/06/24
+
+Fixes:
+
+  * Fix a regression in the URL detection introduced in 0.5.0
+    when the URL is in a list or withing text with non-ASCII
+    characters.
+  * Fix a crash in the recent notes when clicking on the empty
+    space. (Closes #586081)
+  * Fix missing headers.
+  * Fix a bug where after import from Tomboy the titles wouldn't
+    look like titles.
+
+Translations:
+
+  * Updated translations:
+    - German (de)
+    - Marathi (mr)
+    - Spanish (es)
+
+  * Added translations:
+    - Assamese (as)
+    - Gujarati (gu)
+    - Italian (it)
+    - Kannada (kn)
+    - Russian (ru)
+    - Tamil (ta)
+
+0.5.0 - 2009/06/16
+
+New features:
+
+  * Sticky Notes import addin.
+  * Import from Tomboy on first startup. (Closes #578981)
+
+Fixes:
+
+  * Remove libxml++. (Closes #579292) Possibly closes bug #579316.
+  * Some code cleanups.
+  * Fix a race condition causing a crash. (Closes #584183)
+  * Add --{en,dis}able-applet to configure. (Closes #584158) 
+    (Gilles Dartiguelongue)
+  * Don't open the start note if it is an applet. (Closes #584583)
+  * Update boost.m4 to latest version. (Closes #581559) (Priit Laes)
+  * Fix bug in URL parsing causing file link when not appropriate.
+    (Closes #581506)
+  * Replace the regex support from Boost.Regex with PCRE.
+  * WikiWord now support non ASCII (Closes #581495)
+  * Allow using Boost TR1 implementation if really needed.
+  * No longer reference Tomboy in the help screenshot (Closes #581195)
+    (Tony Manco)
+  * Hotkeys changes not being taken into account until restart.
+    (Closes #582789) (Yves Junqueira)
+  * Enable/disable spellchecking when the preferences are changed. 
+    (Closes #582242)
+  * Fix a bug in serializing date/time values with 0 micro-second
+    (Closes #581844)
+
+Translations:
+
+  * Updated translations:
+    - Arabic (ar)
+    - Bengali India (bn_IN)
+    - French (fr)
+    - German (de)
+    - Japanese (ja)
+    - Spanish (es)
+  * Added translations:
+    - Marathi (mr)
+    - Punjabi (pa)
+
+0.4.0 - 2009/05/27
+
+New features:
+
+  * Handle command line argument --version and --search
+  * Backlinks addin.
+  * Addin to export to HTML.
+
+Fixes:
+
+  * Hard require on libxml++ 2.26. Should prevent some bugs (Bug #583807, 
+    Bug #583808, Bug #579292, Bug #579316)
+    See: http://git.gnome.org/cgit/libxml++/commit/?id=24b3ec06f5c5ebd0529100a5506a8038f14bac5b
+  * Note is now trackable. Should avoid a crash related to signals.
+    (Closes #581618)
+  * Remove obsolete UTF-8 keyword in .desktop (Closes #581623) 
+    (Robert Millan)
+  * Fix build with LDFLAGS="-Wl,--as-needed" (Closes #581559)
+    (Priit Laes)
+  * '-' in note title was mistakenly doubled in the menu. (Closes #581643)
+  * Fix crash when entering an URL instead of a host name for the 
+    bugzilla icon in the bugzilla addin (Closes #581080)
+  * Stop calculating the status icon menu position by thyself.
+  * Fix UI for InsertTimeStamp addin (Closes #582788) (0.1.1)
+  * Fix inconsistency in search dialog selection causing drag and 
+    drop and delete to mis-behave. (Closes #579107, Closes #582757)
+  * gnote-applet is in libexec. (Closes #581631)
+  * Fix markup error in German localization (Closes #582975)
+  * Fix error on first run in German (de_DE) (Debian bug #528930)
+
+Translations:
+
+  * Added translations:
+    - Bengali India (bn_IN)
+    - Hungarian (hu)
+  * Updated translations:
+    - Arabic (ar)
+    - German (de)
+    - Japanese (ja)
+    - Spanish (es)
+  * Added Greek manual.
+  * Added Spanish manual.
+    
+0.3.1 "Five-One-Four" - 2009/05/05
+
+Fixes:
+
+  * Missing header in src/addins/inserttimestamp/inserttimestampnoteaddin.cpp
+  * Don't crash when deleting a note (Closes #579839)
+  * Plugged various memory leaks.
+  * Cleared up a few Gtkmm warnings.
+  * Applet was trying to use an icon named "tomboy" (Closes #581226) 
+    (Robert Millan)
+  * .desktop file didn't have the version (Jonathon Jongsma)
+  * .desktop has improper XFCE category and should have OnlyShowIn entry
+    for GNOME and XFCE (Closes #580481)
+  * Help didn't work in the Note windows. (Closes #581200)
+  * Notebook addin toolbar button was inconsistent. (Closes #581213)
+  * Delete notebook now works in the search dialog. (Closes #581222)
+  * Popup menus in the search dialog now appear.
+  * Output options at the end of configure and fail if D-Bus is enabled.
+
+Translations:
+
+  * Added translations:
+    - Japanese (ja)
+  * Updated translations:
+    - Arabic (ar)
+    - Catalan (ca)
+    - French (fr)
+    - Spanish (es)
+  * Fix format causing crashes. (Closes #580868)
+  * Fix a typo in the gconf schema description (Closes #581239)
+  * Fix small translatable strings (Closes #579197)
+
+0.3.0 - 2009/04/29
+
+New features:
+
+  * Applet support (Closes #578979).
+  * Print addon.
+  * Insert Time Stamp addon.
+  * Bugzilla addon.
+  * Implement addin preferences.
+
+Fixes:
+
+  * Should now build if Gtk+ 2.16 is present but not Gtkmm 2.16.
+  * Should build with Gtk+ 2.12 and Gtkmm 2.12 (Closes #580250) (Robert Millan)
+  * Fix a typo in gnote.1 (Closes #580211) (Robert Millan)
+  * Desktop file reflect XFCE and bugzilla component. (Closes #580481) 
+    (Ritesh Khadgaray)
+  * Missing accelerators in link context menu (Closes #580443)
+    (Mário Machado)
+  * Reference bugzilla component in server file (Closes #579198)
+
+Translations: 
+
+  * Short descriptions in shema must not end with a '.' (Closes #579337)
+  * Added translations:
+    - British English (en_GB)
+    - Czech (cs)
+    - Portuguese (pt)
+    - Spanish (es)
+    - Thai (th)
+  * Update translations:
+    - Arabic (ar)
+    - German (de)
+
+0.2.0 - 2009/04/22
+
+New features
+
+  * Now support addins (Bug #578980):
+    - Fixed Width
+  * Show addins in preferences.
+
+Fixes:
+
+  * Can now close the template note opened when the Preferences
+    dialog is open. (Close #579105)
+  * Check for Gtk+ 2.14 or later and include gtk/gtk.h in src/utils.cpp
+    (Close #579240)
+  * Fix wrongly highlighted URLs and a crash when inserting in some situation.
+    (Close #579225)
+  * Fix offsets on WikiWord (similar to bug #579225)
+  * Initialize gettext properly (Close #579520)
+  * Properly check for libxml2.
+  * Drag and drop of notes to a notebook (Close #579637)
+  * Fixed hang when changing the title of a note (Close #579362)
+  * The open state of notes is now saved properly.
+
+Translations:
+
+  * Update comment to reflect format in strings. (Close #579209)
+  * Ensure the spelling of Gnote.
+  * Some strings shouldn't be translated. (Close #579197)
+  * Date format are non localizable. (Close #579207)
+  * Properly use plural forms (Close #579412)
+  * Remove markup from translatable strings (Close #579453)
+  * Added translations:
+    - Swedish (sv)
+    - Greek (el)
+    - Arabic (ar)
+    - Catalan (ca)
+    - German (de)
+    - French (fr)
+
+0.1.2 - 2009/04/15
+
+  * Don't return containers on the stack.
+  * BUG: Pinning notes now work.
+  * BUG: Fix a potential crasher in PrefsKeybinder in the gconf
+    callback.
+  * BUG: Fixed typos in man page.
+  * BUG: Remove the use of gettext calls that are only in glib 2.18
+  * BUG: Fix Note search that didn't work. (Close #578956) (Wade Berrier)
+  * BUG: Fix the position of the menu in case of popping upward.
+    (Close #578958)
+  * NEW: Imported the manual (Close #578982)
+  * NEW: Addin preferences. (TO FINISH)
+  * Clarified some (c) notices.
+
+0.1.1 - 2009/04/07
+
+  * Fix some includes that were missing.
+  * Remove any traces of the use of BOOST_FOR_EACH as it is not
+    in boost 1.34.
+
+0.1.0 - 2009/04/06
+
+  * Initial release.
