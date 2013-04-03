@@ -1,0 +1,20 @@
+# -*- mode: python -*-
+
+import sys
+
+_localdirbase = "~/gnote"
+_gsdk = "10.7"
+_sdkversion = "10.7"
+_architecture = "x86_64"
+
+checkoutroot = os.path.expanduser(_localdirbase + "/" + _gsdk + "/source")
+prefix = os.path.expanduser(_localdirbase  + "/" + _gsdk + "/inst")
+tarballdir = os.path.expanduser(_localdirbase + "/pkgs")
+
+# Main setup
+setup_sdk(target=_gsdk, sdk_version=_sdkversion, architectures=[_architecture])
+
+# Main module set
+moduleset = "https://raw.github.com/mjfrancis/GnoteOSX/master/osx/jhbuild/gnote-osx.modules"
+
+
