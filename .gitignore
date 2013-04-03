@@ -86,3 +86,6 @@ po/POTFILES
 po/*.gmo
 po/*.pot
 osx/Gnote.app
+.DS_Store
+.DS_Store?
+
