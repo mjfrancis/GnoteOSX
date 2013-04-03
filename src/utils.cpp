@@ -87,7 +87,6 @@ namespace gnote {
     }
 
     namespace {
-
       void get_menu_position (Gtk::Menu * menu,
                               int & x,
                               int & y,
@@ -328,29 +327,6 @@ namespace gnote {
       m_fake_menu.append (*foo);
     }
 
-/*
-    void GlobalKeybinder::add_accelerator2(const sigc::slot<void> & handler, const std::string & accelerator,
-                                          Gtk::AccelFlags flags)
-    {
-
-      guint accel_key;
-      Gdk::ModifierType modifiers;
-
-      Gtk::AccelGroup::parse (accelerator, accel_key, modifiers);
-
-      Gtk::MenuItem *foo = manage(new Gtk::MenuItem ());
-      foo->signal_activate().connect(handler);
-      foo->add_accelerator ("activate",
-                          m_accel_group,
-                          accel_key,
-                          modifiers,
-                          flags);
-      foo->show ();
-
-      m_fake_menu.append (*foo);
-
-    }
-*/
 
     HIGMessageDialog::HIGMessageDialog(Gtk::Window *parent,
                                        GtkDialogFlags flags, Gtk::MessageType msg_type, 

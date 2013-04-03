@@ -76,11 +76,7 @@ namespace gnote {
 
       void add_accelerator(const sigc::slot<void> & , guint, Gdk::ModifierType, 
                            Gtk::AccelFlags);
-/*
-      void add_accelerator2(const sigc::slot<void> &, const std::string &,
-                            Gtk::AccelFlags);
-*/
-
+      
     private:
       Glib::RefPtr<Gtk::AccelGroup> m_accel_group;
       Gtk::Menu m_fake_menu;
