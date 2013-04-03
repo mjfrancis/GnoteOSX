@@ -85,3 +85,4 @@ po/Makefile.in.in
 po/POTFILES
 po/*.gmo
 po/*.pot
+osx/Gnote.app
