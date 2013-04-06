@@ -23,6 +23,8 @@
               href="ftp://xmlsoft.org/libxml2/"/>
   <repository type="tarball" name="python"
               href="http://www.python.org/ftp/python/"/>
+  <repository type="tarball" name="itstool.org"
+              href="http://files.itstool.org/itstool/"/>
 
   <!-- 1. jhbuild environment fixups -->
 
@@ -163,16 +165,35 @@
     </dependencies>
   </autotools>
 
+  <!-- Needed by yelp-xsl -->
+  <autotools id="itstool">
+    <branch repo="itstool.org"
+            module="itstool-1.2.0.tar.bz2"
+            version="1.2.0"
+            hash="sha256:46fed63fb89c72dbfc03097b4477084ff05ad6f171212d8f1f1546ea543978aa"
+            size="82479"/>
+  </autotools>
+
   <!-- Needed by yelp-tools -->
   <autotools id="yelp-xsl">
     <branch repo="git.gnome.org" module="yelp-xsl" version="3.8.0"/>
+    <dependencies>
+      <dep package="libxslt"/>
+      <dep package="libxml2"/>
+      <dep package="intltool"/>
+      <dep package="itstool"/>
+    </dependencies>
   </autotools>
 
   <!-- Needed by gnote -->
   <autotools id="yelp-tools">
     <branch repo="git.gnome.org" module="yelp-tools" version="3.6.1"/>
     <dependencies>
+      <dep package="libxslt"/>
+      <dep package="libxml2"/>
+      <dep package="intltool"/>
       <dep package="yelp-xsl"/>
+      <dep package="itstool"/>
     </dependencies>
   </autotools>
 
