@@ -2,6 +2,7 @@
 
 import sys
 
+# Build settings
 _localdirbase = "~/gnote"
 _gsdk = "10.7"
 _sdkversion = "10.7"
@@ -17,4 +18,6 @@ setup_sdk(target=_gsdk, sdk_version=_sdkversion, architectures=[_architecture])
 # Main module set
 moduleset = "https://raw.github.com/mjfrancis/GnoteOSX/master/osx/jhbuild/gnote-osx.modules"
 
+# Skip building python on 10.7 - causes later explosions due to mixing of site and local python modules
+skip = ['python']
 

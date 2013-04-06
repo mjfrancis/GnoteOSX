@@ -2,90 +2,82 @@
 <!DOCTYPE moduleset SYSTEM "moduleset.dtd">
 <?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
 <moduleset>
-  <include href="https://raw.github.com/jralls/gtk-osx-build/master/modulesets-stable/gtk-osx.modules"/>
+  <include href="https://raw.github.com/jralls/gtk-osx-build/master/modulesets/gtk-osx.modules"/>
   <repository type="git" name="git.gnome.org"
               href="git://git.gnome.org/"/>
   <repository type="tarball" name="ftp.gnome.org" default="yes"
               href="http://ftp.gnome.org/pub/GNOME/sources/"/>
   <repository type="tarball" name="dbus.freedesktop.org"
 	            href="http://dbus.freedesktop.org/releases/"/>
-  <repository type="svn" name="svn.boost.org"
-              href="https://svn.boost.org/svn/"/>
+  <repository type="tarball" name="boost.sf.net"
+              href="http://iweb.dl.sourceforge.net/project/boost/" />
   <repository type="tarball" name="abisource/enchant"
               href="http://www.abisource.com/downloads/enchant/" />
+  <repository type="tarball" name="tango.freedesktop.org"
+              href="http://tango.freedesktop.org/releases/" />
   <repository type="git" name="github.com"
               href="git://github.com/"/>
+  <repository type="git" name="nongnu"
+              href="git://git.sv.nongnu.org/"/>
+  <repository type="tarball" name="xmlsoft.org"
+              href="ftp://xmlsoft.org/libxml2/"/>
+  <repository type="tarball" name="python"
+              href="http://www.python.org/ftp/python/"/>
 
-  <autotools id="gnome-themes-standard">
-    <branch module="gnome-themes-standard/3.6/gnome-themes-standard-3.6.5.tar.xz"
-            version="3.6.5"
-            hash="sha256:e39129063b2edcad19370e06b46bbe7fb61fcb4a0c5901eaa9e0d08080097a3c"/>
-    <dependencies>
-      <dep package="meta-gtk-osx-bootstrap"/>
-      <dep package="meta-gtk-osx-gtk3"/>
-      <dep package="librsvg"/>
-    </dependencies>
-  </autotools>
+  <!-- 1. jhbuild environment fixups -->
 
-  <autotools id="yelp-xsl">
-    <branch repo="git.gnome.org" module="yelp-xsl" version="3.8.0"/>
-  </autotools>
-
-  <autotools id="yelp-tools">
-    <branch repo="git.gnome.org" module="yelp-tools" version="3.6.1"/>
-    <dependencies>
-      <dep package="yelp-xsl"/>
-    </dependencies>
-  </autotools>
-
-  <autotools id="gtk-mac-bundler">
-    <branch repo="git.gnome.org" module="gtk-mac-bundler" version="0.7"/>
-    <dependencies>
-      <dep package="meta-gtk-osx-gtk3"/>
-    </dependencies>
-  </autotools>
-
-
-  <autotools id="gtk+-3.0"
-             autogenargs="--enable-quartz-backend --disable-colord  --enable-quartz-relocation">
-    <branch module="gtk+/3.6/gtk+-3.6.4.tar.xz" checkoutdir="gtk+-3.0" version="3.6.4"
-            hash="sha256:dbda37986f934f986c0bb20f2b0c59f2717a2e5c098370ad69677ff89295f1a1">
- <!--      <patch file="http://git.gnome.org/browse/gtk-osx/plain/patches/0001-Bug-571582-GtkSelection-implementation-for-quartz.patch" strip="1"/> -->
-     <patch file="http://git.gnome.org/browse/gedit/plain/osx/jhbuild/patches/gtk-settings-ini-xdg.patch" strip="1"/>
-<!--      <patch file="http://git.gnome.org/browse/gedit/plain/osx/jhbuild/patches/gtk-dnd-offscreen.patch" strip="1"/> -->
-<!--      <patch file="http://git.gnome.org/browse/gedit/plain/osx/jhbuild/patches/gtk-introspection.patch" strip="1"/> -->
-    </branch>
-    <dependencies>
-      <dep package="glib"/>
+  <!-- Module missing in "modulesets" -->
+  <autotools id="gdk-pixbuf-gtk3">
+    <branch repo="git.gnome.org" module="gdk-pixbuf" checkoutdir="gdk-pixbuf-gtk3" tag="gdk-pixbuf-2-26"/>
+    <after>
       <dep package="pango"/>
-      <dep package="atk"/>
-      <dep package="gdk-pixbuf"/>
-      <dep package="gobject-introspection"/>
+    </after>
+  </autotools>
+
+  <!-- Module missing in "modulesets" -->
+  <autotools id="glibmm3">
+    <branch repo="git.gnome.org" module="glibmm" checkoutdir="glibmm3" tag="glibmm-2-34"/>
+    <dependencies>
+      <dep package="libsigc++2"/>
     </dependencies>
+    <after>
+      <dep package="glib"/>
+    </after>
+  </autotools>
+
+  <!-- Module missing in "modulesets" -->
+  <autotools id="freetype" skip-autogen="never"
+             autogen-template="%(srcdir)s/%(autogen-sh)s &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s --libdir %(libdir)s %(autogenargs)s">
+    <branch module="freetype/freetype2" tag="VER-2-4-10" repo="nongnu"/>
+    <dependencies>
+      <dep package="zlib"/>
+    </dependencies>
+  </autotools>
+
+  <!-- Can't check this out from CVS from behind the great firey wall for some unfathomable reason -->
+  <autotools id="icon-naming-utils">
+    <branch repo="tango.freedesktop.org" module="icon-naming-utils-0.8.90.tar.gz" version="0.8.90"/>
     <after>
       <dep package="meta-gtk-osx-bootstrap"/>
     </after>
   </autotools>
 
-  <autotools id="enchant" autogen-sh="autogen.sh">
-    <branch module="1.6.0/enchant-1.6.0.tar.gz" version="1.6.0"
-	    repo="abisource/enchant">
-	  <patch file="http://git.gnome.org/browse/gedit/plain/osx/jhbuild/patches/enchant-applespell.patch" strip="1"/>
-	</branch>
+  <!-- Git version is unclean after build, and breaks the build on the second time -->
+  <autotools id="gtk-doc" autogenargs="--disable-scrollkeeper --with-xml-catalog=$JHBUILD_PREFIX/etc/xml/catalog"
+             makeargs="-k -i" makeinstallargs="-k -i install"
+             autogen-sh="configure">
+    <branch version="1.18" module="gtk-doc/1.18/gtk-doc-1.18.tar.bz2"
+            hash="sha256:a634d2e93d70468237033c06a17c97f29cf71a35ac5cc01c016324c965d42f73"/>
     <dependencies>
-      <dep package="glib"/>
+      <dep package="gtk-osx-docbook"/>
+      <dep package="gnome-doc-utils"/>
     </dependencies>
   </autotools>
 
-  <autotools id="libsecret">
-    <branch module="http://ftp.gnome.org/pub/gnome/sources/libsecret/0.15/libsecret-0.15.tar.xz"
-            version="0.15"
-            hash="sha256:33e728b843efbe099483376ff5a3469260ee4b6ce035c7730909ac3793cb0fb8"/>
-    <dependencies>
-      <dep package="libgcrypt"/>
-    </dependencies>
-  </autotools>
 
+  <!-- 2. Modules that are in jhbuild but need specific patches -->
+
+  <!-- Needs patching to make it filesystem position independent so it can be included in an application bundle -->
   <autotools id="dbus" autogen-sh='configure'
 	   autogenargs="--disable-selinux --without-x --disable-launchd --with-session-socket-dir=/var/tmp">
     <branch module="dbus/dbus-1.6.8.tar.gz" version="1.6.8" repo="dbus.freedesktop.org">
@@ -96,41 +88,113 @@
     </after>
   </autotools>
 
-  <autotools id="boost">
-    <branch repo="svn.boost.org" module="boost/tags/release/Boost_1_53_0/" version="1.53"/>
+  <!-- Needs patching to bridge to the OSX system spellchecker (applespell) -->
+  <autotools id="enchant" autogen-sh="autogen.sh">
+    <branch module="1.6.0/enchant-1.6.0.tar.gz" version="1.6.0"
+	    repo="abisource/enchant">
+	  <patch file="http://git.gnome.org/browse/gedit/plain/osx/jhbuild/patches/enchant-applespell.patch" strip="1"/>
+	</branch>
+    <dependencies>
+      <dep package="glib"/>
+    </dependencies>
   </autotools>
 
+
+  <!-- 3. Other dependencies that aren't in jhbuild -->
+
+  <!-- Needed by gnote -->
+	<autotools id="boost"
+             autogen-sh="./bootstrap.sh"
+             autogen-template="%(srcdir)s/%(autogen-sh)s --prefix=%(prefix)s"
+             supports-non-srcdir-builds="false"
+             makeargs="|| ./bjam link=shared threading=multi variant=release"
+             makeinstallargs="|| ./bjam install link=shared threading=multi variant=release"
+             check-target="false">
+    <branch repo="boost.sf.net" module="boost/1.45.0/boost_1_45_0.tar.gz" version="1.45.0" />
+  </autotools>
+
+  <!-- Needed by gnote -->
   <autotools id="ossp-uuid">
     <branch module="ftp://ftp.ossp.org/pkg/lib/uuid/uuid-1.6.2.tar.gz"
             version="1.6.2"
             hash="sha256:11a615225baa5f8bb686824423f50e4427acd3f70d394765bdff32801f0fd5b0"/>
   </autotools>
 
+  <!-- Needed to package gnote into an OSX application bundle -->
+  <autotools id="gtk-mac-bundler">
+    <branch repo="git.gnome.org" module="gtk-mac-bundler" version="0.7"/>
+    <dependencies>
+      <dep package="meta-gtk-osx-gtk3"/>
+    </dependencies>
+  </autotools>
+
+  <!-- Needed by gnote -->
   <autotools id="gnome-icon-theme-symbolic">
-    <branch repo="git.gnome.org" module="gnome-icon-theme-symbolic" version="3.8.0.1"/>
+    <branch repo="ftp.gnome.org" module="gnome-icon-theme-symbolic/3.8/gnome-icon-theme-symbolic-3.8.0.1.tar.xz" version="3.8.0.1">
+      <patch file="https://raw.github.com/mjfrancis/GnoteOSX/master/osx/jhbuild/patches/gnome-icon-theme-symbolic-compile-without-gnome-install.patch" strip="1"/>
+    </branch>
     <dependencies>
       <dep package="icon-naming-utils"/>
     </dependencies>
   </autotools>
 
+  <!-- Needed to make gnote pretty -->
+  <autotools id="gnome-themes-standard"
+             autogen-sh="configure"
+             autogenargs="--disable-gtk2-engine"
+             skip-autogen="never">
+    <branch module="gnome-themes-standard/3.6/gnome-themes-standard-3.6.5.tar.xz"
+            version="3.6.5"
+            hash="sha256:e39129063b2edcad19370e06b46bbe7fb61fcb4a0c5901eaa9e0d08080097a3c"/>
+    <dependencies>
+      <dep package="meta-gtk-osx-bootstrap"/>
+      <dep package="meta-gtk-osx-gtk3"/>
+      <dep package="librsvg"/>
+    </dependencies>
+  </autotools>
+
+  <!-- Needed by gnote -->
+  <autotools id="libsecret">
+    <branch module="http://ftp.gnome.org/pub/gnome/sources/libsecret/0.15/libsecret-0.15.tar.xz"
+            version="0.15"
+            hash="sha256:33e728b843efbe099483376ff5a3469260ee4b6ce035c7730909ac3793cb0fb8"/>
+    <dependencies>
+      <dep package="libgcrypt"/>
+    </dependencies>
+  </autotools>
+
+  <!-- Needed by yelp-tools -->
+  <autotools id="yelp-xsl">
+    <branch repo="git.gnome.org" module="yelp-xsl" version="3.8.0"/>
+  </autotools>
+
+  <!-- Needed by gnote -->
+  <autotools id="yelp-tools">
+    <branch repo="git.gnome.org" module="yelp-tools" version="3.6.1"/>
+    <dependencies>
+      <dep package="yelp-xsl"/>
+    </dependencies>
+  </autotools>
+
+
+  <!-- 4. Gnote itself -->
   <autotools id="gnote">
     <branch repo="github.com" module="mjfrancis/GnoteOSX" version="master"/>
     <dependencies>
       <dep package="meta-gtk-osx-bootstrap"/>
-      <dep package="freetype"/>
-      <dep package="fontconfig"/>
+      <dep package="meta-gtk-osx-freetype"/>
+      <dep package="meta-gtk-osx-gtk3"/>
       <dep package="meta-gtk-osx-gtkmm3"/>
-      <dep package="gtk-mac-integration"/>
-      <dep package="gtk-mac-bundler"/>
-      <dep package="gtkspell3"/>
-      <dep package="dbus"/>
-      <dep package="gnome-themes-standard"/>
-      <dep package="yelp-tools"/>
-      <dep package="libsecret"/>
       <dep package="boost"/>
-      <dep package="ossp-uuid"/>
+      <dep package="dbus"/>
       <dep package="enchant"/>
       <dep package="gnome-icon-theme-symbolic"/>
+      <dep package="gnome-themes-standard"/>
+      <dep package="gtk-mac-bundler"/>
+      <dep package="gtkspell3"/>
+      <dep package="libsecret"/>
+      <dep package="ossp-uuid"/>
+      <dep package="yelp-tools"/>
     </dependencies>
   </autotools>
 
