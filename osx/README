@@ -1,0 +1,27 @@
+Building Gnote on OSX
+
+
+Set up jhbuild
+--------------
+1. Install jhbuild
+Follow the installation instructions on https://live.gnome.org/GTK%2B/OSX/Building (don't bootstrap jhbuild yet)
+
+2. Setup jhbuild to build gnote
+i) Get the gnote build config file
+$ curl -o ~/.jhbuildrc-gnote https://raw.github.com/mjfrancis/GnoteOSX/master/osx/jhbuild/jhbuildrc-gnote
+
+ii) The jhbuildrc provided builds for OSX 10.7. Edit it if you are compiling for a different release.
+
+iii) Edit ~/.jhbuildrc-custom and comment out the call to setup_sdk
+
+3. Build gnote
+$ JHB=gnote jhbuild bootstrap
+$ JHB=gnote jhbuild build gnote
+
+4. Build the OSX application bundle
+The raw binary won't do anything much by itself - it needs dbus to be running. To build a working Gnote.app that includes dbus, and all necessary libraries and data:
+From within the gnote build directory (~/gnote/<OS RELEASE>/source/GnoteOSX)
+$ JHB=gnote jhbuild shell
+(jhbuild shell)$ cd osx
+(jhbuild shell)$ ./makebundle.sh
+
