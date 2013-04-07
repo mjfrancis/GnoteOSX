@@ -48,6 +48,7 @@ namespace gnote {
       desktop_settings->signal_changed().connect(
         sigc::mem_fun(*this, &NoteEditor::on_font_setting_changed));
     }
+#endif
 
     // Set Font from preference
     if (settings->get_boolean(Preferences::ENABLE_CUSTOM_FONT)) {
@@ -59,7 +60,6 @@ namespace gnote {
     }
 
     settings->signal_changed().connect(sigc::mem_fun(*this, &NoteEditor::on_font_setting_changed));
-#endif
 
     // Set extra editor drag targets supported (in addition
     // to the default TextView's various text formats)...
