@@ -23,10 +23,11 @@
 #include "eggaccelerators.h"
 
 #include <string.h>
-#ifndef PLATFORM_OSX
+#include <gdk/gdkkeysyms.h>
+
+#ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
 #endif
-#include <gdk/gdkkeysyms.h>
 
 enum
 {

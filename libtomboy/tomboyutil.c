@@ -25,15 +25,13 @@
 #include <config.h>
 
 #include <gdk/gdk.h>
-#ifndef PLATFORM_OSX
-#include <gdk/gdkx.h>
-#endif
 #include <gtk/gtk.h>
-#ifndef PLATFORM_OSX
+
+#ifdef GDK_WINDOWING_X11
+#include <gdk/gdkx.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #endif
-
 
 #include "tomboykeybinder.h"
 #include "tomboyutil.h"

@@ -27,7 +27,8 @@
 #include <string.h>
 
 #include <gdk/gdk.h>
-#ifndef PLATFORM_OSX
+
+#ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
 #include <X11/Xlib.h>
 #endif
