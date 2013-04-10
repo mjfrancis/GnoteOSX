@@ -50,6 +50,10 @@ rm -rf Gnote.app/Contents/Resources/share/themes/Default/gtk-2.0-key
 echo "Installing gdk-pixbuf loader cache"
 gdk-pixbuf-query-loaders | sed -e 's|.*\(/gdk-pixbuf-2.0/[^/]*/loaders/[^/]*\)$|"@executable_path/../Resources/lib\1|g' > Gnote.app/Contents/Resources/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
 
+echo "Installing URL handler"
+mkdir Gnote.app/Contents/Resources/share/applications
+cp app-data/{mimeinfo.cache,open.desktop} Gnote.app/Contents/Resources/share/applications/
+
 echo "Strip debug symbols from bundle binaries"
 strip_binaries
 

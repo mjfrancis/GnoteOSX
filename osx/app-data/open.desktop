@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Open
+GenericName=Open
+Comment=Open
+Exec=open %u
+Termina=false
+Type=Application
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
