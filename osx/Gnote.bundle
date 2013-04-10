@@ -60,7 +60,6 @@
   <!-- Copy in enchant modules -->
   <binary>${prefix}/lib/enchant/libenchant_*.so</binary>
   <binary>${prefix}/share/enchant/enchant.ordering</binary>
-<!--  <binary>${prefix}/lib/enchant/libenchant_applespell.so</binary> -->
 
   <!-- Copy in gio modules -->
   <binary>${prefix}/lib/gio/modules/*.so</binary>
@@ -89,15 +88,18 @@
   <data>${prefix}/share/themes/Default</data>
   <data>${prefix}/share/themes/Adwaita</data>
 
-  <!-- App icon -->
-  <data dest="${bundle}/Contents/Resources">${project}/gnote.icns</data>
-
   <!-- gsettings schema -->
   <data>${prefix}/share/glib-2.0/schemas/gschemas.compiled</data>
 
-  <data dest="${bundle}/Contents/Resources/etc/gtk-3.0/settings.ini">${project}/settings.ini</data>
+  <!-- Miscellaneous configuration and data -->
+  <data dest="${bundle}/Contents">${project}/app-data/Contents</data>
 
   <!-- Icon theme -->
   <icon-theme icons="auto">hicolor</icon-theme>
+  <icon-theme icons="none">gnome</icon-theme>
+  <data>${prefix}/share/icons/gnome/scalable/actions/edit-find-symbolic.svg</data>
+  <data>${prefix}/share/icons/gnome/scalable/emblems/emblem-system-symbolic.svg</data>
+  <data>${prefix}/share/icons/gnome/22x22/emblems/emblem-package.png</data>
+
 
 </app-bundle>
