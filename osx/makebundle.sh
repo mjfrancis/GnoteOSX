@@ -47,9 +47,6 @@ echo "Removing unnecessary files from bundle"
 rm -rf Gnote.app/Contents/Resources/share/themes/Adwaita/gtk-2.0
 rm -rf Gnote.app/Contents/Resources/share/themes/Default/gtk-2.0-key
 
-# broken - causes crash
-rm -f Gnote.app/Contents/Resources/lib/gnote/addins/3.9.0/notedirectorywatcher.*
-
 echo "Installing gdk-pixbuf loader cache"
 gdk-pixbuf-query-loaders | sed -e 's|.*\(/gdk-pixbuf-2.0/[^/]*/loaders/[^/]*\)$|"@executable_path/../Resources/lib\1|g' > Gnote.app/Contents/Resources/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
 

@@ -25,6 +25,8 @@
               href="http://www.python.org/ftp/python/"/>
   <repository type="tarball" name="itstool.org"
               href="http://files.itstool.org/itstool/"/>
+  <repository type="tarball" name="people.gnome.org"
+              href="http://people.gnome.org/"/>
 
   <!-- 1. jhbuild environment fixups -->
 
@@ -197,12 +199,19 @@
     </dependencies>
   </autotools>
 
+  <!-- Optional dependency of glib needed by gnote's note directory watcher -->
+  <autotools id="gamin">
+    <branch repo="people.gnome.org" module="~veillard/gamin/sources/gamin-0.1.9.tar.gz" version="0.1.9">
+      <patch file="http://git.gnome.org/browse/gedit/plain/osx/jhbuild/patches/gamin-osx.patch" strip="1"/>
+    </branch>
+  </autotools>
 
   <!-- 4. Gnote itself -->
   <autotools id="gnote">
     <branch repo="github.com" module="mjfrancis/GnoteOSX" version="master"/>
     <dependencies>
       <dep package="meta-gtk-osx-bootstrap"/>
+      <dep package="gamin"/>
       <dep package="meta-gtk-osx-freetype"/>
       <dep package="meta-gtk-osx-gtk3"/>
       <dep package="meta-gtk-osx-gtkmm3"/>
