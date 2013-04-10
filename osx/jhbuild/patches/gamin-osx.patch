@@ -1,164 +1,164 @@
---- gamin-0.1.9-orig/libgamin/Makefile.in	2013-04-10 10:44:24.000000000 +0800
-+++ gamin-0.1.9/libgamin/Makefile.in	2007-07-27 22:36:40.000000000 +0800
+--- gamin-0.1.9-orig/libgamin/Makefile.in	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/libgamin/Makefile.in	2013-04-10 11:41:51.000000000 +0800
 @@ -260,12 +260,12 @@
  
  CLEANFILES = gam_error.c gam_event.c
  libgamin_1_la_LIBADD = 
--libgamin_1_la_LDFLAGS = \
-+libgamin_1_la_LDFLAGS = -Wl,--version-script=$(srcdir)/gamin_sym.version \
+-libgamin_1_la_LDFLAGS = -Wl,--version-script=$(srcdir)/gamin_sym.version \
++libgamin_1_la_LDFLAGS = \
                          -version-info @GAMIN_VERSION_INFO@ @THREAD_LIBS@
  
  libfam_la_SOURCES = $(libgamin_1_la_SOURCES)
  libfam_la_LIBADD = $(libgamin_1_la_LIBADD)
--libfam_la_LDFLAGS = \
-+libfam_la_LDFLAGS = -Wl,--version-script=$(srcdir)/gamin_sym.version	\
+-libfam_la_LDFLAGS = -Wl,--version-script=$(srcdir)/gamin_sym.version	\
++libfam_la_LDFLAGS = \
                      -version-info @FAM_VERSION_INFO@ @THREAD_LIBS@
  
  gamin_SOURCES = gamin.c
---- gamin-0.1.9-orig/libgamin/gam_api.c	2013-04-10 10:44:24.000000000 +0800
-+++ gamin-0.1.9/libgamin/gam_api.c	2007-07-04 21:36:48.000000000 +0800
-@@ -14,8 +14,6 @@
+--- gamin-0.1.9-orig/libgamin/gam_api.c	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/libgamin/gam_api.c	2013-04-10 11:41:52.000000000 +0800
+@@ -14,6 +14,8 @@
  #include <sys/socket.h>
  #include <sys/un.h>
  #include <sys/uio.h>
--#include <string.h>
--#include <sys/select.h>
++#include <string.h>
++#include <sys/select.h>
  #include "fam.h"
  #include "gam_protocol.h"
  #include "gam_data.h"
-@@ -360,7 +358,7 @@
+@@ -358,7 +360,7 @@
      int retries = 0;
  
    retry_start:
--    fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+    fd = socket(PF_UNIX, SOCK_STREAM, 0);
+-    fd = socket(PF_UNIX, SOCK_STREAM, 0);
++    fd = socket(AF_UNIX, SOCK_STREAM, 0);
      if (fd < 0) {
          gam_error(DEBUG_INFO, "Failed to create unix socket\n");
          return (-1);
---- gamin-0.1.9-orig/python/Makefile.in	2013-04-10 10:44:24.000000000 +0800
-+++ gamin-0.1.9/python/Makefile.in	2007-07-27 22:36:40.000000000 +0800
+--- gamin-0.1.9-orig/python/Makefile.in	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/python/Makefile.in	2013-04-10 11:41:53.000000000 +0800
 @@ -232,15 +232,15 @@
  AUTOMAKE_OPTIONS = 1.4 foreign
  SUBDIRS = tests
  INCLUDES = \
-+	-I$(PYTHON_INCLUDES)	\
+-	-I$(PYTHON_INCLUDES)	\
  	-I$(top_srcdir)/libgamin\
--	-I$(top_srcdir)/lib	\
--	-I$(PYTHON_INCLUDES)
-+	-I$(top_srcdir)/lib
+-	-I$(top_srcdir)/lib
++	-I$(top_srcdir)/lib	\
++	-I$(PYTHON_INCLUDES)
  
  EXTRA_DIST = \
  	gamin.c			\
  	gamin.py
  
--_gamin_la_LDFLAGS = -module -avoid-version
-+_gamin_la_LDFLAGS = -module -avoid-version -L$(top_builddir)/libgamin/.libs
+-_gamin_la_LDFLAGS = -module -avoid-version -L$(top_builddir)/libgamin/.libs
++_gamin_la_LDFLAGS = -module -avoid-version
  @WITH_PYTHON_TRUE@mylibs = \
  @WITH_PYTHON_TRUE@	$(top_builddir)/libgamin/libgamin-1.la
  
---- gamin-0.1.9-orig/server/gam_channel.c	2013-04-10 10:44:24.000000000 +0800
-+++ gamin-0.1.9/server/gam_channel.c	2007-07-04 21:36:49.000000000 +0800
-@@ -7,7 +7,6 @@
+--- gamin-0.1.9-orig/server/gam_channel.c	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/server/gam_channel.c	2013-04-10 11:41:53.000000000 +0800
+@@ -7,6 +7,7 @@
  #include <sys/stat.h>
  #include <sys/un.h>
  #include <sys/uio.h>
--#include <string.h>
++#include <string.h>
  #include "gam_error.h"
  #include "gam_connection.h"
  #include "gam_channel.h"
-@@ -622,7 +621,7 @@
+@@ -621,7 +622,7 @@
      int fd;
      struct sockaddr_un addr;
  
--    fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+    fd = socket(PF_UNIX, SOCK_STREAM, 0);
+-    fd = socket(PF_UNIX, SOCK_STREAM, 0);
++    fd = socket(AF_UNIX, SOCK_STREAM, 0);
      if (fd < 0) {
          GAM_DEBUG(DEBUG_INFO, "Failed to create unix socket");
          return (-1);
---- gamin-0.1.9-orig/server/gam_conf.c	2013-04-10 10:44:24.000000000 +0800
-+++ gamin-0.1.9/server/gam_conf.c	2007-07-04 21:36:49.000000000 +0800
-@@ -7,7 +7,6 @@
+--- gamin-0.1.9-orig/server/gam_conf.c	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/server/gam_conf.c	2013-04-10 11:41:53.000000000 +0800
+@@ -7,6 +7,7 @@
  #include <sys/stat.h>
  #include <unistd.h>
  #include <string.h>
--#include <strings.h>
++#include <strings.h>
  #include <errno.h>
  #include <glib.h>
  
---- gamin-0.1.9-orig/server/gam_kqueue.c	2013-04-10 10:44:24.000000000 +0800
-+++ gamin-0.1.9/server/gam_kqueue.c	2007-07-04 21:50:41.000000000 +0800
-@@ -49,9 +49,6 @@
+--- gamin-0.1.9-orig/server/gam_kqueue.c	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/server/gam_kqueue.c	2013-04-10 11:41:54.000000000 +0800
+@@ -49,6 +49,9 @@
   */
  
  #include "config.h"
--
--#undef _POSIX_C_SOURCE
--
++
++#undef _POSIX_C_SOURCE
++
  #include <string.h>
  #include <fcntl.h>
  #include <unistd.h>
---- gamin-0.1.9-orig/server/gam_node.c	2013-04-10 10:47:03.000000000 +0800
-+++ gamin-0.1.9/server/gam_node.c	2007-07-04 21:36:49.000000000 +0800
+--- gamin-0.1.9-orig/server/gam_node.c	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/server/gam_node.c	2013-04-10 11:41:54.000000000 +0800
 @@ -122,7 +122,7 @@
   * it has finished with the string.  If it must keep it longer, it
   * should makes its own copy.  The returned string must not be freed.
   */
--const char *
-+G_CONST_RETURN char *
+-G_CONST_RETURN char *
++const char *
  gam_node_get_path(GamNode * node)
  {
      g_assert(node);
---- gamin-0.1.9-orig/server/gam_node.h	2013-04-10 10:47:26.000000000 +0800
-+++ gamin-0.1.9/server/gam_node.h	2007-07-04 21:36:49.000000000 +0800
+--- gamin-0.1.9-orig/server/gam_node.h	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/server/gam_node.h	2013-04-10 11:41:55.000000000 +0800
 @@ -58,7 +58,7 @@
  void                  gam_node_set_is_dir          (GamNode         *node,
  						   gboolean        is_dir);
  	
--const char           *gam_node_get_path            (GamNode         *node);
-+G_CONST_RETURN char  *gam_node_get_path            (GamNode         *node);
+-G_CONST_RETURN char  *gam_node_get_path            (GamNode         *node);
++const char           *gam_node_get_path            (GamNode         *node);
  
  GList                *gam_node_get_subscriptions   (GamNode         *node);
  
---- gamin-0.1.9-orig/server/gam_poll_basic.c	2013-04-10 10:44:24.000000000 +0800
-+++ gamin-0.1.9/server/gam_poll_basic.c	2007-07-04 21:46:29.000000000 +0800
-@@ -38,6 +38,7 @@
+--- gamin-0.1.9-orig/server/gam_poll_basic.c	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/server/gam_poll_basic.c	2013-04-10 11:41:55.000000000 +0800
+@@ -38,7 +38,6 @@
  #include "gam_event.h"
  #include "gam_excludes.h"
  
-+#define VERBOSE_POLL
+-#define VERBOSE_POLL
  
  static gboolean gam_poll_basic_add_subscription(GamSubscription * sub);
  static gboolean gam_poll_basic_remove_subscription(GamSubscription * sub);
---- gamin-0.1.9-orig/server/gam_subscription.c	2013-04-10 10:47:43.000000000 +0800
-+++ gamin-0.1.9/server/gam_subscription.c	2007-07-04 21:36:49.000000000 +0800
+--- gamin-0.1.9-orig/server/gam_subscription.c	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/server/gam_subscription.c	2013-04-10 11:41:56.000000000 +0800
 @@ -141,7 +141,7 @@
   * @param sub the GamSubscription
   * @returns The path being monitored.  It should not be freed.
   */
--const char *
-+G_CONST_RETURN char *
+-G_CONST_RETURN char *
++const char *
  gam_subscription_get_path(GamSubscription * sub)
  {
      if (sub == NULL)
---- gamin-0.1.9-orig/server/gam_subscription.h	2013-04-10 10:48:09.000000000 +0800
-+++ gamin-0.1.9/server/gam_subscription.h	2007-07-04 21:36:49.000000000 +0800
+--- gamin-0.1.9-orig/server/gam_subscription.h	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/server/gam_subscription.h	2013-04-10 11:41:57.000000000 +0800
 @@ -21,7 +21,7 @@
  
  int                  gam_subscription_get_reqno    (GamSubscription *sub);
  
--const char          *gam_subscription_get_path     (GamSubscription *sub);
-+G_CONST_RETURN char *gam_subscription_get_path     (GamSubscription *sub);
+-G_CONST_RETURN char *gam_subscription_get_path     (GamSubscription *sub);
++const char          *gam_subscription_get_path     (GamSubscription *sub);
  
  GamListener         *gam_subscription_get_listener (GamSubscription *sub);
  
---- gamin-0.1.9-orig/tests/Makefile.in	2013-04-10 10:44:24.000000000 +0800
-+++ gamin-0.1.9/tests/Makefile.in	2007-07-27 22:36:40.000000000 +0800
+--- gamin-0.1.9-orig/tests/Makefile.in	2013-04-10 11:21:06.000000000 +0800
++++ gamin-0.1.9/tests/Makefile.in	2013-04-10 11:41:57.000000000 +0800
 @@ -219,7 +219,7 @@
  testgam_SOURCES = testing.c
  testgam_LDFLAGS = 
  testgam_DEPENDENCIES = $(DEPS)
--testgam_LDADD = $(LDADDS) $(top_builddir)/libgamin/libgamin-1.la
-+testgam_LDADD = $(LDADDS) -L$(top_builddir)/libgamin -lgamin-1
+-testgam_LDADD = $(LDADDS) -L$(top_builddir)/libgamin -lgamin-1
++testgam_LDADD = $(LDADDS) $(top_builddir)/libgamin/libgamin-1.la
  all: all-am
  
  .SUFFIXES:
