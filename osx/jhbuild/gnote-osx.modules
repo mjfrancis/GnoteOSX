@@ -200,7 +200,7 @@
   </autotools>
 
   <!-- Optional dependency of glib needed by gnote's note directory watcher -->
-  <autotools id="gamin">
+  <autotools id="gamin" skip-autogen="never" autogen-sh="autoreconf">
     <branch repo="people.gnome.org" module="~veillard/gamin/sources/gamin-0.1.9.tar.gz" version="0.1.9">
       <patch file="https://raw.github.com/mjfrancis/GnoteOSX/master/osx/jhbuild/patches/gamin-osx.patch" strip="1"/>
     </branch>
