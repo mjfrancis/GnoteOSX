@@ -48,7 +48,7 @@
 gint
 tomboy_window_get_workspace (GtkWindow *window)
 {
-#ifdef PLATFORM_OSX
+#ifndef GDK_WINDOWING_X11
 	return -1;
 #else
 	GdkWindow *gdkwin = gtk_widget_get_window(GTK_WIDGET (window));
@@ -80,7 +80,7 @@ tomboy_window_get_workspace (GtkWindow *window)
 void
 tomboy_window_move_to_current_workspace (GtkWindow *window)
 {
-#ifdef PLATFORM_OSX
+#ifndef GDK_WINDOWING_X11
 	return;
 #else
 	GdkWindow *gdkwin = gtk_widget_get_window(GTK_WIDGET (window));
@@ -137,7 +137,7 @@ tomboy_window_move_to_current_workspace (GtkWindow *window)
 static void
 tomboy_window_override_user_time (GtkWindow *window)
 {
-#ifndef PLATFORM_OSX
+#ifdef GDK_WINDOWING_X11
 	guint32 ev_time = gtk_get_current_event_time();
 
 	if (ev_time == 0) {

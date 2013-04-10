@@ -547,7 +547,7 @@ reload_modmap (GdkKeymap *keymap,
                EggModmap *modmap)
 {
 
-#ifndef PLATFORM_OSX
+#ifdef GDK_WINDOWING_X11
   XModifierKeymap *xmodmap;
   int map_size;
   int i;
