@@ -400,8 +400,11 @@ namespace gnote {
     , m_keybinder(new GnotePrefsKeybinder(keybinder, manager, *this))
     , m_context_menu(NULL)
   {
-    gtk_status_icon_set_tooltip_text(gobj(), 
-                                     tray_util_get_tooltip_text().c_str());
+#ifdef PLATFORM_OSX
+    // TODO no icon unless this is done here - what isn't happening that would under X?
+    set (IconManager::obj().get_icon(IconManager::NOTE, 19));
+#endif
+    set_tooltip_text(tray_util_get_tooltip_text());
 
     IGnote::obj().signal_quit.connect(sigc::mem_fun(*this, &TrayIcon::on_exit));
     signal_activate().connect(sigc::mem_fun(*this, &TrayIcon::on_activate));
@@ -436,11 +439,16 @@ namespace gnote {
 
   void TrayIcon::on_popup_menu(guint button, guint32 activate_time)
   {
+#ifdef PLATFORM_OSX
+  // Gtk+ on OSX appears to currently only support left-click on a status icon, which invokes on_popup_menu
+  show_menu(false);
+#else
     DBG_OUT("popup");
     if(button == 3) {
       Gtk::Menu *menu = get_right_click_menu();
       popup_menu_at_position(*menu, button, activate_time);
     }
+#endif
   }  
 
   Gtk::Menu * TrayIcon::get_right_click_menu()
@@ -512,6 +520,9 @@ namespace gnote {
 
   bool TrayIcon::menu_opens_upward()
   {
+#ifdef PLATFORM_OSX
+      return false;
+#else
       bool open_upwards = false;
       int val = 0;
 //      Glib::RefPtr<Gdk::Screen> screen;
@@ -529,6 +540,7 @@ namespace gnote {
         open_upwards = true;
 
       return open_upwards;
+#endif
   }
 
   bool TrayIcon::on_size_changed(int size)
