@@ -1,9 +1,57 @@
---- gamin-0.1.9-orig/libgamin/Makefile.in	2013-04-10 11:21:06.000000000 +0800
-+++ gamin-0.1.9/libgamin/Makefile.in	2013-04-10 11:41:51.000000000 +0800
-@@ -260,12 +260,12 @@
+Only in gamin-0.1.9: autom4te.cache
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/config.h.in gamin-0.1.9/config.h.in
+--- gamin-0.1.9-orig/config.h.in	2007-07-27 22:27:58.000000000 +0800
++++ gamin-0.1.9/config.h.in	2013-05-03 18:44:47.000000000 +0800
+@@ -33,6 +33,9 @@
+ /* Define to 1 if you have the `getlogin_r' function. */
+ #undef HAVE_GETLOGIN_R
  
- CLEANFILES = gam_error.c gam_event.c
- libgamin_1_la_LIBADD = 
++/* Define to 1 if you have the `getpeereid' function. */
++#undef HAVE_GETPEEREID
++
+ /* Have GNU-style varargs macros */
+ #undef HAVE_GNUC_VARARGS
+ 
+@@ -102,6 +105,10 @@
+ /* Define to 1 if you have the `usleep' function. */
+ #undef HAVE_USLEEP
+ 
++/* Define to the sub-directory in which libtool stores uninstalled libraries.
++   */
++#undef LT_OBJDIR
++
+ /* Name of package */
+ #undef PACKAGE
+ 
+@@ -117,6 +124,9 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+ 
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/configure.in gamin-0.1.9/configure.in
+--- gamin-0.1.9-orig/configure.in	2007-07-27 22:20:20.000000000 +0800
++++ gamin-0.1.9/configure.in	2013-05-03 18:43:09.000000000 +0800
+@@ -86,7 +86,7 @@
+ 
+ AM_CONDITIONAL(ENABLE_GTK_DOC, test x$enable_gtk_doc = xyes)
+ 
+-AC_CHECK_FUNCS(usleep setsid setenv putenv getlogin_r)
++AC_CHECK_FUNCS(usleep setsid setenv putenv getlogin_r getpeereid)
+ AC_STRUCT_ST_MTIM_NSEC
+ 
+ dnl
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/libgamin/Makefile.am gamin-0.1.9/libgamin/Makefile.am
+--- gamin-0.1.9-orig/libgamin/Makefile.am	2007-07-04 21:36:48.000000000 +0800
++++ gamin-0.1.9/libgamin/Makefile.am	2013-05-03 20:22:36.000000000 +0800
+@@ -39,12 +39,12 @@
+ 
+ libgamin_1_la_LIBADD =
+ 
 -libgamin_1_la_LDFLAGS = -Wl,--version-script=$(srcdir)/gamin_sym.version \
 +libgamin_1_la_LDFLAGS = \
                          -version-info @GAMIN_VERSION_INFO@ @THREAD_LIBS@
@@ -14,9 +62,10 @@
 +libfam_la_LDFLAGS = \
                      -version-info @FAM_VERSION_INFO@ @THREAD_LIBS@
  
- gamin_SOURCES = gamin.c
+ #
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/libgamin/gam_api.c gamin-0.1.9/libgamin/gam_api.c
 --- gamin-0.1.9-orig/libgamin/gam_api.c	2013-04-10 11:21:06.000000000 +0800
-+++ gamin-0.1.9/libgamin/gam_api.c	2013-04-10 11:41:52.000000000 +0800
++++ gamin-0.1.9/libgamin/gam_api.c	2013-05-03 18:56:04.000000000 +0800
 @@ -14,6 +14,8 @@
  #include <sys/socket.h>
  #include <sys/un.h>
@@ -35,29 +84,30 @@
      if (fd < 0) {
          gam_error(DEBUG_INFO, "Failed to create unix socket\n");
          return (-1);
---- gamin-0.1.9-orig/python/Makefile.in	2013-04-10 11:21:06.000000000 +0800
-+++ gamin-0.1.9/python/Makefile.in	2013-04-10 11:41:53.000000000 +0800
-@@ -232,15 +232,15 @@
- AUTOMAKE_OPTIONS = 1.4 foreign
- SUBDIRS = tests
- INCLUDES = \
--	-I$(PYTHON_INCLUDES)	\
- 	-I$(top_srcdir)/libgamin\
--	-I$(top_srcdir)/lib
-+	-I$(top_srcdir)/lib	\
-+	-I$(PYTHON_INCLUDES)
- 
- EXTRA_DIST = \
- 	gamin.c			\
- 	gamin.py
- 
--_gamin_la_LDFLAGS = -module -avoid-version -L$(top_builddir)/libgamin/.libs
-+_gamin_la_LDFLAGS = -module -avoid-version
- @WITH_PYTHON_TRUE@mylibs = \
- @WITH_PYTHON_TRUE@	$(top_builddir)/libgamin/libgamin-1.la
- 
+@@ -730,7 +732,19 @@
+         c_pid = cmsg.cred.cmcred_pid;
+         c_uid = cmsg.cred.cmcred_euid;
+         c_gid = cmsg.cred.cmcred_groups[0];
+-#else /* !SO_PEERCRED && !HAVE_CMSGCRED */
++#elif defined(HAVE_GETPEEREID)
++	uid_t euid;
++	gid_t egid;
++	c_pid = 0;
++
++	if (getpeereid (fd, &euid, &egid) == 0) {
++		c_uid = euid;
++	} else {
++		GAM_DEBUG(DEBUG_INFO,
++                      "Failed to getpeereid()");
++            goto failed;
++	}
++#else /* !SO_PEERCRED && !HAVE_CMSGCRED && !HAVE_GETPEEREID */
+         GAM_DEBUG(DEBUG_INFO,
+                   "Socket credentials not supported on this OS\n");
+         goto failed;
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/server/gam_channel.c gamin-0.1.9/server/gam_channel.c
 --- gamin-0.1.9-orig/server/gam_channel.c	2013-04-10 11:21:06.000000000 +0800
-+++ gamin-0.1.9/server/gam_channel.c	2013-04-10 11:41:53.000000000 +0800
++++ gamin-0.1.9/server/gam_channel.c	2013-05-03 18:56:14.000000000 +0800
 @@ -7,6 +7,7 @@
  #include <sys/stat.h>
  #include <sys/un.h>
@@ -66,7 +116,28 @@
  #include "gam_error.h"
  #include "gam_connection.h"
  #include "gam_channel.h"
-@@ -621,7 +622,7 @@
+@@ -171,7 +172,19 @@
+ 	c_pid = cmsg.cred.cmcred_pid;
+ 	c_uid = cmsg.cred.cmcred_euid;
+ 	c_gid = cmsg.cred.cmcred_groups[0];
+-#else /* !SO_PEERCRED && !HAVE_CMSGCRED */
++#elif defined(HAVE_GETPEEREID)
++	uid_t euid;
++	gid_t egid;
++	c_pid = 0;
++
++	if (getpeereid (fd, &euid, &egid) == 0) {
++		c_uid = euid;
++	} else {
++		GAM_DEBUG(DEBUG_INFO,
++                      "Failed to getpeereid()");
++            goto failed;
++	}
++#else /* !SO_PEERCRED && !HAVE_CMSGCRED && !HAVE_GETPEEREID */
+         GAM_DEBUG(DEBUG_INFO,
+                   "Socket credentials not supported on this OS\n");
+         goto failed;
+@@ -621,7 +634,7 @@
      int fd;
      struct sockaddr_un addr;
  
@@ -75,6 +146,7 @@
      if (fd < 0) {
          GAM_DEBUG(DEBUG_INFO, "Failed to create unix socket");
          return (-1);
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/server/gam_conf.c gamin-0.1.9/server/gam_conf.c
 --- gamin-0.1.9-orig/server/gam_conf.c	2013-04-10 11:21:06.000000000 +0800
 +++ gamin-0.1.9/server/gam_conf.c	2013-04-10 11:41:53.000000000 +0800
 @@ -7,6 +7,7 @@
@@ -85,6 +157,7 @@
  #include <errno.h>
  #include <glib.h>
  
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/server/gam_kqueue.c gamin-0.1.9/server/gam_kqueue.c
 --- gamin-0.1.9-orig/server/gam_kqueue.c	2013-04-10 11:21:06.000000000 +0800
 +++ gamin-0.1.9/server/gam_kqueue.c	2013-04-10 11:41:54.000000000 +0800
 @@ -49,6 +49,9 @@
@@ -97,6 +170,20 @@
  #include <string.h>
  #include <fcntl.h>
  #include <unistd.h>
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/server/gam_listener.c gamin-0.1.9/server/gam_listener.c
+--- gamin-0.1.9-orig/server/gam_listener.c	2007-07-04 21:36:49.000000000 +0800
++++ gamin-0.1.9/server/gam_listener.c	2013-05-03 20:30:46.000000000 +0800
+@@ -62,7 +62,9 @@
+     GamListener *listener;
+ 
+     g_assert(service);
++#ifndef HAVE_GETPEEREID
+     g_assert(pid != 0);
++#endif
+ 
+     listener = g_new0(GamListener, 1);
+     listener->service = service;
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/server/gam_node.c gamin-0.1.9/server/gam_node.c
 --- gamin-0.1.9-orig/server/gam_node.c	2013-04-10 11:21:06.000000000 +0800
 +++ gamin-0.1.9/server/gam_node.c	2013-04-10 11:41:54.000000000 +0800
 @@ -122,7 +122,7 @@
@@ -108,6 +195,8 @@
  gam_node_get_path(GamNode * node)
  {
      g_assert(node);
+Only in gamin-0.1.9-orig/server: gam_node.c~
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/server/gam_node.h gamin-0.1.9/server/gam_node.h
 --- gamin-0.1.9-orig/server/gam_node.h	2013-04-10 11:21:06.000000000 +0800
 +++ gamin-0.1.9/server/gam_node.h	2013-04-10 11:41:55.000000000 +0800
 @@ -58,7 +58,7 @@
@@ -119,6 +208,7 @@
  
  GList                *gam_node_get_subscriptions   (GamNode         *node);
  
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/server/gam_poll_basic.c gamin-0.1.9/server/gam_poll_basic.c
 --- gamin-0.1.9-orig/server/gam_poll_basic.c	2013-04-10 11:21:06.000000000 +0800
 +++ gamin-0.1.9/server/gam_poll_basic.c	2013-04-10 11:41:55.000000000 +0800
 @@ -38,7 +38,6 @@
@@ -129,6 +219,7 @@
  
  static gboolean gam_poll_basic_add_subscription(GamSubscription * sub);
  static gboolean gam_poll_basic_remove_subscription(GamSubscription * sub);
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/server/gam_subscription.c gamin-0.1.9/server/gam_subscription.c
 --- gamin-0.1.9-orig/server/gam_subscription.c	2013-04-10 11:21:06.000000000 +0800
 +++ gamin-0.1.9/server/gam_subscription.c	2013-04-10 11:41:56.000000000 +0800
 @@ -141,7 +141,7 @@
@@ -140,6 +231,8 @@
  gam_subscription_get_path(GamSubscription * sub)
  {
      if (sub == NULL)
+Only in gamin-0.1.9-orig/server: gam_subscription.c~
+diff -x configure -x Makefile.in -x aclocal.m4 -ur gamin-0.1.9-orig/server/gam_subscription.h gamin-0.1.9/server/gam_subscription.h
 --- gamin-0.1.9-orig/server/gam_subscription.h	2013-04-10 11:21:06.000000000 +0800
 +++ gamin-0.1.9/server/gam_subscription.h	2013-04-10 11:41:57.000000000 +0800
 @@ -21,7 +21,7 @@
@@ -151,14 +244,4 @@
  
  GamListener         *gam_subscription_get_listener (GamSubscription *sub);
  
---- gamin-0.1.9-orig/tests/Makefile.in	2013-04-10 11:21:06.000000000 +0800
-+++ gamin-0.1.9/tests/Makefile.in	2013-04-10 11:41:57.000000000 +0800
-@@ -219,7 +219,7 @@
- testgam_SOURCES = testing.c
- testgam_LDFLAGS = 
- testgam_DEPENDENCIES = $(DEPS)
--testgam_LDADD = $(LDADDS) -L$(top_builddir)/libgamin -lgamin-1
-+testgam_LDADD = $(LDADDS) $(top_builddir)/libgamin/libgamin-1.la
- all: all-am
- 
- .SUFFIXES:
+Only in gamin-0.1.9-orig/server: gam_subscription.h~
