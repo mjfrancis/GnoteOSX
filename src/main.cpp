@@ -27,7 +27,21 @@
 
 int main(int argc, char **argv)
 {
-  bindtextdomain(GETTEXT_PACKAGE, GNOTE_LOCALEDIR);
+
+  const char *runtime_sharedir;
+  const char *locale_dir;
+
+  runtime_sharedir = getenv ("GNOTE_SHAREDIR");
+  if (runtime_sharedir)
+  {
+    locale_dir = g_build_filename (runtime_sharedir, "locale", NULL);
+  }
+  else
+  {
+    locale_dir = GNOTE_LOCALEDIR;
+  }
+
+  bindtextdomain(GETTEXT_PACKAGE, locale_dir);
   bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
   textdomain(GETTEXT_PACKAGE);
 
