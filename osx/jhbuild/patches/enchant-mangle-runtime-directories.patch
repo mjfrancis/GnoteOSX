@@ -1,0 +1,142 @@
+--- /tmp/enchant-1.6.0/src/enchant.c	2010-04-02 04:53:37.000000000 +0800
++++ src/enchant.c	2013-05-09 15:45:59.000000000 +0800
+@@ -172,30 +172,16 @@
+ 	GSList *user_dirs = NULL;
+ 
+ 	{
+-		const char * user_config_dir;
+-		
+-		user_config_dir = g_get_user_config_dir();
+-		
+-		if (user_config_dir)
+-			user_dirs = enchant_slist_append_unique_path (user_dirs, g_build_filename (user_config_dir,
++		const char *runtime_prefix;
++
++		runtime_prefix = getenv ("ENCHANT_SHAREDIR");
++
++		if (runtime_prefix) {
++			user_dirs = enchant_slist_append_unique_path (user_dirs, g_build_filename (runtime_prefix,
+ 										 "enchant",
+ 										 NULL));
+-	}
+-
+-	{
+-		GSList *home_dirs = NULL, *dir;
+-		home_dirs = _enchant_get_user_home_dirs ();
+-		
+-		for (dir = home_dirs; dir; dir = dir->next)
+-			{
+-				user_dirs = enchant_slist_append_unique_path (user_dirs,
+-							    g_build_filename (dir->data,
+-									      ENCHANT_USER_PATH_EXTENSION,
+-									      NULL));
+-			}
++		}
+ 
+-		g_slist_foreach (home_dirs, (GFunc)g_free, NULL);
+-		g_slist_free (home_dirs);
+ 	}
+ 
+ 	return user_dirs;
+@@ -211,85 +197,38 @@
+ 	char * prefix = NULL;
+ 
+ 	{
+-		char* user_module_dir;
+-		
+-		user_module_dir = enchant_get_registry_value_ex (1, "Config", "Module_Dir");
+-		if (user_module_dir)
+-			module_dirs = enchant_slist_append_unique_path (module_dirs, user_module_dir);
+-	}
++		const char *runtime_prefix;
+ 
+-#ifdef XP_TARGET_COCOA
+-	module_dirs = enchant_slist_append_unique_path (module_dirs, g_strdup ([[EnchantResourceProvider instance] moduleFolder]));
+-#endif
+-
+-	{
+-		GSList *user_dirs, *iter;
++		runtime_prefix = getenv ("ENCHANT_LIBDIR");
+ 
+-		user_dirs = enchant_get_user_dirs();
++		if (runtime_prefix) {
++			module_dirs = enchant_slist_append_unique_path (module_dirs, g_build_filename (runtime_prefix,
++										     "enchant",
++										     NULL));
++		}
+ 
+-		for (iter = user_dirs; iter; iter = iter->next)
+-			module_dirs = enchant_slist_append_unique_path (module_dirs, iter->data);
+-		
+-		g_slist_free (user_dirs);
+ 	}
+ 
+-	/* Look for explicitly set registry values */
+-	module_dir = enchant_get_registry_value_ex (0, "Config", "Module_Dir");
+-	if (module_dir)
+-		module_dirs = enchant_slist_append_unique_path (module_dirs, module_dir);
+-
+-#if defined(ENCHANT_GLOBAL_MODULE_DIR)
+-	module_dirs = enchant_slist_append_unique_path (module_dirs, g_strdup (ENCHANT_GLOBAL_MODULE_DIR));
+-#else
+-	/* Dynamically locate library and search for modules relative to it. */
+-	prefix = enchant_get_prefix_dir();
+-	if(prefix)
+-		{
+-			module_dir = g_build_filename(prefix,"lib","enchant",NULL);
+-			g_free(prefix);
+-			module_dirs = enchant_slist_append_unique_path (module_dirs, module_dir);
+-		}
+-#endif
+-
+ 	return module_dirs;
+ }
+ 
+ static GSList *
+ enchant_get_conf_dirs (void)
+ {
+-	GSList *conf_dirs = NULL, *user_conf_dirs, *iter;
+-	char * ordering_dir = NULL, * prefix = NULL;
+-
+-	user_conf_dirs = enchant_get_user_config_dirs();
+-
+-	for (iter = user_conf_dirs; iter != NULL; iter = iter->next)
+-		{
+-			conf_dirs = enchant_slist_append_unique_path (conf_dirs, iter->data);
+-		}
++	GSList *conf_dirs = NULL;
+ 
+-	g_slist_free (user_conf_dirs);
++	{
++		const char *runtime_prefix;
+ 
+-#ifdef XP_TARGET_COCOA
+-	conf_dirs = enchant_slist_append_unique_path (conf_dirs, g_strdup ([[EnchantResourceProvider instance] configFolder]));
+-#endif
++		runtime_prefix = getenv ("ENCHANT_CONFIGDIR");
+ 
+-	/* Look for explicitly set registry values */
+-	ordering_dir = enchant_get_registry_value_ex (0, "Config", "Data_Dir");
+-	if (ordering_dir)
+-		conf_dirs = enchant_slist_append_unique_path (conf_dirs, ordering_dir);
+-
+-	/* Dynamically locate library and search for files relative to it. */
+-	prefix = enchant_get_prefix_dir();
+-	if(prefix)
+-		{
+-			ordering_dir = g_build_filename(prefix,"share","enchant",NULL);
+-			g_free(prefix);
+-			conf_dirs = enchant_slist_append_unique_path (conf_dirs, ordering_dir);
++		if (runtime_prefix) {
++			conf_dirs = enchant_slist_append_unique_path (conf_dirs, g_build_filename (runtime_prefix,
++										 "enchant",
++										 NULL));
+ 		}
+ 
+-#if defined(ENCHANT_GLOBAL_ORDERING)
+-	conf_dirs = enchant_slist_append_unique_path (conf_dirs, g_strdup (ENCHANT_GLOBAL_ORDERING));
+-#endif
++	}
+ 
+ 	return conf_dirs;
+ }

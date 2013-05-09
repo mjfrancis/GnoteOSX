@@ -73,6 +73,9 @@
   <data>${prefix}/share/dbus-1</data>
   <binary>${prefix}/libexec/dbus-daemon-launch-helper</binary>
 
+  <!-- gamin -->
+  <binary>${prefix}/libexec/gam_server</binary>
+
   <!-- GTK+3 data -->
   <data>${prefix}/etc/gtk-3.0/*</data>
 
@@ -87,6 +90,7 @@
   <!-- Themes -->
   <data>${prefix}/share/themes/Default</data>
   <data>${prefix}/share/themes/Adwaita</data>
+  <data>${prefix}/share/themes/Mac</data>
 
   <!-- gsettings schema -->
   <data>${prefix}/share/glib-2.0/schemas/gschemas.compiled</data>

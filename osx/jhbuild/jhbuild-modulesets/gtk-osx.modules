@@ -1,0 +1,226 @@
+<?xml version="1.0"?><!--*- mode: nxml; indent-tabs-mode: nil -*-->
+<!DOCTYPE moduleset SYSTEM "moduleset.dtd">
+<?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
+<moduleset>
+  <repository type="tarball" name="ftp.gnome.org" default="yes"
+              href="http://ftp.gnome.org/pub/GNOME/sources/"/>
+  <repository type="tarball" name="sourceforge"
+              href="http://downloads.sourceforge.net/sourceforge/"/>
+  <repository type="tarball" name="cairographics"
+              href="http://cairographics.org/releases/"/>
+  <repository type="tarball" name="ftp.gnu.org"
+              href="http://ftp.gnu.org/gnu/"/>
+  <repository type="tarball" name="sourceware.org"
+              href="ftp://sourceware.org/pub/"/>
+
+  <!-- This module set works a bit differently than for example the
+       GNOME ones do. It's split up in seperate pieces:
+
+       - gtk-osx-bootstrap: contains bootstrap-like modules that you
+         don't want to rebuild all the time.
+
+       - gtk-osx.modules: contains the core GTK+ stack. This does not
+         have a hard dependency on the bootstrap modules, in order to
+         make it easy to rebuild the whole core stack without redoing
+         the bootstrap parts. They have a soft, "after", depencency.
+
+       The remaining modules are mostly for testing and might not work
+       all the time:
+
+       - gtk-osx-python.modules: self explaining.
+       - gtk-osx-gtkmm.modules: self explaining.
+       - gtk-osx-gstreamer.modules: self explaining.
+       - gtk-osx-themes.modules: self explaining.
+
+       - gtk-osx-random.modules: "random stuff", has apps for testing GTK+.
+       - gtk-osx-unsupported.modules: more testing stuff, competely unsupported.
+  -->
+
+  <include href="gtk-osx-bootstrap.modules"/>
+  <include href="gtk-osx-gstreamer.modules"/>
+  <include href="gtk-osx-gtkmm.modules"/>
+  <include href="gtk-osx-python.modules"/>
+  <include href="gtk-osx-random.modules"/>
+  <include href="gtk-osx-themes.modules"/>
+  <include href="gtk-osx-unsupported.modules"/>
+  <include href="gtk-osx-universal.modules"/>
+
+  <metamodule id="meta-gtk-osx-core">
+    <dependencies>
+      <dep package="gtk+"/>
+      <dep package="gtk-mac-integration"/>
+    </dependencies>
+    <after>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </metamodule>
+
+  <metamodule id="meta-gtk-osx-gtk3">
+    <dependencies>
+      <dep package="gtk+-3.0"/>
+      <dep package="gtk-mac-integration"/>
+    </dependencies>
+    <after>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </metamodule>
+
+  <autotools id="glib" autogen-sh="configure">
+    <branch module="glib/2.34/glib-2.34.3.tar.xz"  version="2.34.3"
+            hash="sha256:855fcbf87cb93065b488358e351774d8a39177281023bae58c286f41612658a7"/>
+    <dependencies>
+      <dep package="libffi"/>
+    </dependencies>
+    <after>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </autotools>
+
+  <autotools id="libffi" autogenargs="--disable-builddir"
+             autogen-sh="configure">
+    <branch module="libffi/libffi-3.0.11.tar.gz" repo="sourceware.org"
+            version="3.0.11" checkoutdir="atgreen-libffi-873d687"/>
+  </autotools>
+
+<!-- This is the latest 0.10 version. Later versions are 1.29 and intended to work with glib 2.29; the minor version of gobject-introspection will track the minor version of glib that it's intended to work with. Note that in the unlikely event you need to introspect Gtk+-2.0, you need to build Glib 1.28 and use this gobject-introspection. The default is to *not* introspect Gtk+-2.0 and to use the latest GLib and Gobject-Introspection with Gtk3 -->
+  <autotools id="gobject-introspection-10" autogen-sh="configure">
+    <branch module="gobject-introspection/0.10/gobject-introspection-0.10.8.tar.bz2"
+            version="0.10.8"
+            hash="sha256:5b1387ff37f03db880a2b1cbd6c6b6dfb923a29468d4d8367c458abf7704c61e">
+      <patch file="http://git.gnome.org/browse/gtk-osx/plain/patches/girscanner-objc.patch" strip="1"/>
+    </branch>
+    <dependencies>
+      <dep package="glib"/>
+      <dep package="cairo"/>
+     <dep package="libffi"/>
+    </dependencies>
+  </autotools>
+
+  <autotools id="gobject-introspection" autogen-sh="configure">
+    <branch module="gobject-introspection/1.34/gobject-introspection-1.34.2.tar.xz"
+            version="1.34.2"
+            hash="sha256:bc7948a35ce2218922dfb0806679cad21060715cc0c340cf7823eb633cc03429">
+      <patch file="http://git.gnome.org/browse/gtk-osx/plain/patches/girscanner-objc.patch" strip="1"/>
+    </branch>
+    <dependencies>
+      <dep package="glib"/>
+      <dep package="cairo"/>
+    </dependencies>
+  </autotools>
+
+ <autotools id="pango"  autogen-sh="configure">
+    <branch version="1.34.0" module="pango/1.34/pango-1.34.0.tar.xz"
+            hash="sha256:105da1efe019018a9de81681d88c9ace83d2111509ab625c4be9d124a1fdce27">
+    </branch>
+    <dependencies>
+      <dep package="cairo"/>
+     </dependencies>
+    <after>
+      <dep package="gobject-introspection"/>
+      <dep package="meta-gtk-osx-freetype"/>
+      <dep package="glib"/>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </autotools>
+
+ <autotools id="atk" autogen-sh="configure">
+    <branch module="atk/2.6/atk-2.6.0.tar.xz" version="2.6.0"
+            hash="sha256:eff663f90847620bb68c9c2cbaaf7f45e2ff44163b9ab3f10d15be763680491f"/>
+    <dependencies>
+    </dependencies>
+    <after>
+      <dep package="glib"/>
+      <dep package="glib"/>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </autotools>
+
+  <autotools id="gdk-pixbuf" autogen-sh="configure">
+    <branch module="gdk-pixbuf/2.26/gdk-pixbuf-2.26.5.tar.xz" version="2.26.5"
+            hash="sha256:77696fd163bca95a130a1883dbd78d0ae4d782de2fc85a9a38556d13681f5c84"/>
+    <after>
+      <dep package="pango"/>
+    </after>
+  </autotools>
+
+  <autotools id="gtk+" autogen-sh="autoreconf"
+             autogenargs="--with-gdktarget=quartz --enable-quartz-relocation --disable-introspection">
+    <branch module="gtk+/2.24/gtk+-2.24.16.tar.xz" version="2.24.16"
+            hash="sha256:93cd69cc2cecf9a3aa31a50caf4a24752a6928a48c527ae967b109df6f9302d3">
+      <patch file="http://git.gnome.org/browse/gtk-osx/plain/patches/0004-Bug-571582-GtkSelection-implementation-for-quartz.patch" strip="1"/>
+      <patch file="http://git.gnome.org/browse/gtk-osx/plain/patches/0008-Implement-GtkDragSourceOwner-pasteboardChangedOwner.patch" strip="1"/>
+      <patch file="http://git.gnome.org/browse/gtk-osx/plain/patches/0006-Bug-658722-Drag-and-Drop-sometimes-stops-working.patch" strip="1"/>
+   </branch>
+    <dependencies>
+      <dep package="glib"/>
+      <dep package="pango"/>
+      <dep package="atk"/>
+      <dep package="gdk-pixbuf"/>
+      <dep package="gobject-introspection"/>
+    </dependencies>
+    <after>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </autotools>
+
+  <autotools id="gtk+-3.0" autogen-sh="autogen.sh"
+             autogenargs="--enable-quartz-backend --enable-quartz-relocation">
+    <branch module="gtk+/3.6/gtk+-3.6.4.tar.xz" version="3.6.4"
+            hash="sha256:dbda37986f934f986c0bb20f2b0c59f2717a2e5c098370ad69677ff89295f1a1">
+      <patch file='http://git.gnome.org/browse/gtk-osx/plain/patches/0001-Bug-667759-gtkdnd-quartz.c-is-missing-annotations-fo.patch' strip='1'/>
+    </branch>
+    <dependencies>
+      <dep package="glib"/>
+      <dep package="pango"/>
+      <dep package="atk"/>
+      <dep package="gdk-pixbuf"/>
+      <dep package="gobject-introspection"/>
+    </dependencies>
+    <after>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </autotools>
+
+  <autotools id="pixman" autogenargs="--disable-gtk" autogen-sh="configure">
+    <branch version="0.26.2" module="pixman-0.26.2.tar.gz"
+            repo="cairographics"
+            hash="sha1:3c7d72b5b52e6d301efc68aa480f0737a641bdd3"/>
+    <after>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </autotools>
+
+  <autotools id="cairo"  autogen-sh="configure"
+             autogenargs="--enable-pdf --enable-quartz --enable-xlib=no --without-x">
+    <branch module="cairo-1.12.6.tar.xz"  version="1.12.6"
+            repo="cairographics"
+            hash="sha1:a383c6cb4495e18848ea43e1031c294aa9417a43">
+      <!--patch  file="http://git.gnome.org/browse/gtk-osx/plain/patches/Cairo-44584-llvm-no-flto.patch" strip="1"/>
+      <patch file="http://git.gnome.org/browse/gtk-osx/plain/patches/0001-quartz-Fix-the-32-bits-build-on-MacOSX-10.7.patch" strip="1"/-->
+    </branch>
+    <dependencies>
+      <dep package="pixman"/>
+    </dependencies>
+    <after>
+      <dep package="meta-gtk-osx-bootstrap"/>
+      <dep package="fontconfig"/>
+      <dep package="freetype"/>
+    </after>
+  </autotools>
+
+  <autotools id="gtk-mac-integration" autogen-sh="configure"
+             autogenargs="--disable-python">
+    <branch module="gtk-mac-integration/2.0/gtk-mac-integration-2.0.1.tar.xz"
+            version="2.0.1"
+            hash="sha256:1a3f6c418819499bbf63a1bb8da7f725eb07c3a929028b7bd0c3d5cd5077a181">
+    </branch>
+    <dependencies>
+    </dependencies>
+    <after>
+      <dep package="gtk+"/>
+      <dep package="gtk+-3.0"/>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </autotools>
+
+</moduleset>

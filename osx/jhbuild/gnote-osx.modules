@@ -2,7 +2,7 @@
 <!DOCTYPE moduleset SYSTEM "moduleset.dtd">
 <?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
 <moduleset>
-  <include href="https://raw.github.com/jralls/gtk-osx-build/master/modulesets/gtk-osx.modules"/>
+  <include href="jhbuild-modulesets/gtk-osx.modules"/>
   <repository type="git" name="git.gnome.org"
               href="git://git.gnome.org/"/>
   <repository type="tarball" name="ftp.gnome.org" default="yes"
@@ -13,73 +13,18 @@
               href="http://iweb.dl.sourceforge.net/project/boost/" />
   <repository type="tarball" name="abisource/enchant"
               href="http://www.abisource.com/downloads/enchant/" />
-  <repository type="tarball" name="tango.freedesktop.org"
-              href="http://tango.freedesktop.org/releases/" />
   <repository type="git" name="github.com"
               href="git://github.com/"/>
   <repository type="git" name="nongnu"
               href="git://git.sv.nongnu.org/"/>
   <repository type="tarball" name="xmlsoft.org"
               href="ftp://xmlsoft.org/libxml2/"/>
-  <repository type="tarball" name="python"
-              href="http://www.python.org/ftp/python/"/>
   <repository type="tarball" name="itstool.org"
               href="http://files.itstool.org/itstool/"/>
   <repository type="tarball" name="people.gnome.org"
               href="http://people.gnome.org/"/>
 
-  <!-- 1. jhbuild environment fixups -->
-
-  <!-- Module missing in "modulesets" -->
-  <autotools id="gdk-pixbuf-gtk3">
-    <branch repo="git.gnome.org" module="gdk-pixbuf" checkoutdir="gdk-pixbuf-gtk3" tag="gdk-pixbuf-2-26"/>
-    <after>
-      <dep package="pango"/>
-    </after>
-  </autotools>
-
-  <!-- Module missing in "modulesets" -->
-  <autotools id="glibmm3">
-    <branch repo="git.gnome.org" module="glibmm" checkoutdir="glibmm3" tag="glibmm-2-34"/>
-    <dependencies>
-      <dep package="libsigc++2"/>
-    </dependencies>
-    <after>
-      <dep package="glib"/>
-    </after>
-  </autotools>
-
-  <!-- Module missing in "modulesets" -->
-  <autotools id="freetype" skip-autogen="never"
-             autogen-template="%(srcdir)s/%(autogen-sh)s &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s --libdir %(libdir)s %(autogenargs)s">
-    <branch module="freetype/freetype2" tag="VER-2-4-10" repo="nongnu"/>
-    <dependencies>
-      <dep package="zlib"/>
-    </dependencies>
-  </autotools>
-
-  <!-- Can't check this out from CVS from behind the great firey wall for some unfathomable reason -->
-  <autotools id="icon-naming-utils">
-    <branch repo="tango.freedesktop.org" module="icon-naming-utils-0.8.90.tar.gz" version="0.8.90"/>
-    <after>
-      <dep package="meta-gtk-osx-bootstrap"/>
-    </after>
-  </autotools>
-
-  <!-- Git version is unclean after build, and breaks the build on the second time -->
-  <autotools id="gtk-doc" autogenargs="--disable-scrollkeeper --with-xml-catalog=$JHBUILD_PREFIX/etc/xml/catalog"
-             makeargs="-k -i" makeinstallargs="-k -i install"
-             autogen-sh="configure">
-    <branch version="1.18" module="gtk-doc/1.18/gtk-doc-1.18.tar.bz2"
-            hash="sha256:a634d2e93d70468237033c06a17c97f29cf71a35ac5cc01c016324c965d42f73"/>
-    <dependencies>
-      <dep package="gtk-osx-docbook"/>
-      <dep package="gnome-doc-utils"/>
-    </dependencies>
-  </autotools>
-
-
-  <!-- 2. Modules that are in jhbuild but need specific patches -->
+  <!-- 1. Modules that are in jhbuild but need specific patches -->
 
   <!-- Needs patching to make it filesystem position independent so it can be included in an application bundle -->
   <autotools id="dbus" autogen-sh='configure'
@@ -97,14 +42,35 @@
     <branch module="1.6.0/enchant-1.6.0.tar.gz" version="1.6.0"
 	    repo="abisource/enchant">
 	  <patch file="http://git.gnome.org/browse/gedit/plain/osx/jhbuild/patches/enchant-applespell.patch" strip="1"/>
+    <patch file="patches/enchant-mangle-runtime-directories.patch"/>
 	</branch>
     <dependencies>
       <dep package="glib"/>
     </dependencies>
   </autotools>
 
+  <!-- Temporarily needs patching to fix css keybinding -->
+  <autotools id="gtk+-3.0" autogen-sh="autogen.sh"
+             autogenargs="--enable-quartz-backend --enable-quartz-relocation">
+    <branch module="gtk+/3.6/gtk+-3.6.4.tar.xz" version="3.6.4"
+            hash="sha256:dbda37986f934f986c0bb20f2b0c59f2717a2e5c098370ad69677ff89295f1a1">
+      <patch file='http://git.gnome.org/browse/gtk-osx/plain/patches/0001-Bug-667759-gtkdnd-quartz.c-is-missing-annotations-fo.patch' strip='1'/>
+      <patch file='patches/gtk-css-keybindings-bug.patch'/>
+    </branch>
+    <dependencies>
+      <dep package="glib"/>
+      <dep package="pango"/>
+      <dep package="atk"/>
+      <dep package="gdk-pixbuf"/>
+      <dep package="gobject-introspection"/>
+    </dependencies>
+    <after>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </autotools>
 
-  <!-- 3. Other dependencies that aren't in jhbuild -->
+
+  <!-- 2. Other dependencies that aren't in jhbuild -->
 
   <!-- Needed by gnote -->
 	<autotools id="boost"
@@ -158,7 +124,7 @@
   </autotools>
 
   <!-- Needed by gnote -->
-  <autotools id="libsecret">
+  <autotools id="libsecret" autogenargs="--disable-manpages">
     <branch module="http://ftp.gnome.org/pub/gnome/sources/libsecret/0.15/libsecret-0.15.tar.xz"
             version="0.15"
             hash="sha256:33e728b843efbe099483376ff5a3469260ee4b6ce035c7730909ac3793cb0fb8"/>
@@ -182,7 +148,6 @@
     <dependencies>
       <dep package="libxslt"/>
       <dep package="libxml2"/>
-      <dep package="intltool"/>
       <dep package="itstool"/>
     </dependencies>
   </autotools>
@@ -193,17 +158,32 @@
     <dependencies>
       <dep package="libxslt"/>
       <dep package="libxml2"/>
-      <dep package="intltool"/>
       <dep package="yelp-xsl"/>
       <dep package="itstool"/>
     </dependencies>
   </autotools>
 
+  <!-- Needs to be built first to satisfy circular dependency between gamin and glib -->
+  <autotools id="glib-for-gamin" autogen-sh="configure">
+    <branch module="glib/2.34/glib-2.34.3.tar.xz"  version="2.34.3"
+            hash="sha256:855fcbf87cb93065b488358e351774d8a39177281023bae58c286f41612658a7"
+            checkoutdir="glib-for-gamin"/>
+    <dependencies>
+      <dep package="libffi"/>
+    </dependencies>
+    <after>
+      <dep package="meta-gtk-osx-bootstrap"/>
+    </after>
+  </autotools>
+
   <!-- Optional dependency of glib needed by gnote's note directory watcher -->
   <autotools id="gamin" autogen-template="autoreconf -i &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s --libdir %(libdir)s %(autogenargs)s" skip-autogen="never" >
     <branch repo="people.gnome.org" module="~veillard/gamin/sources/gamin-0.1.9.tar.gz" version="0.1.9">
-      <patch file="https://raw.github.com/mjfrancis/GnoteOSX/master/osx/jhbuild/patches/gamin-osx.patch" strip="1"/>
+      <patch file="patches/gamin-osx.patch" strip="1"/>
     </branch>
+    <dependencies>
+      <dep package="glib-for-gamin"/>
+    </dependencies>
   </autotools>
 
   <!-- 4. Gnote itself -->
