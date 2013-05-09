@@ -55,30 +55,6 @@ ExportToHtmlModule::ExportToHtmlModule()
 {
   ADD_INTERFACE_IMPL(ExportToHtmlNoteAddin);
 }
-const char * ExportToHtmlModule::id() const
-{
-  return "ExportToHtmlAddin";
-}
-const char * ExportToHtmlModule::name() const
-{
-  return _("Export to HTML");
-}
-const char * ExportToHtmlModule::description() const
-{
-  return _("Exports individual notes to HTML.");
-}
-const char * ExportToHtmlModule::authors() const
-{
-  return _("Hubert Figuiere and the Tomboy Project");
-}
-int ExportToHtmlModule::category() const
-{
-  return gnote::ADDIN_CATEGORY_TOOLS;
-}
-const char * ExportToHtmlModule::version() const
-{
-  return "0.1";
-}
 
 sharp::XslTransform *ExportToHtmlNoteAddin::s_xsl = NULL;
 
@@ -138,7 +114,7 @@ void ExportToHtmlNoteAddin::export_button_clicked()
       gnote::utils::open_url("file://" + output_uri.get_absolute_uri());
     } 
     catch (const Glib::Exception & ex) {
-      ERR_OUT ("Could not open exported note in a web browser: %s",
+      ERR_OUT(_("Could not open exported note in a web browser: %s"),
                ex.what().c_str());
 
       std::string detail = str(boost::format(
@@ -165,7 +141,7 @@ void ExportToHtmlNoteAddin::export_button_clicked()
   } 
 #endif
   catch (const sharp::Exception & e) {
-    ERR_OUT("Could not export: %s", e.what());
+    ERR_OUT(_("Could not export: %s"), e.what());
 
     error_message = e.what();
   } 
@@ -173,7 +149,7 @@ void ExportToHtmlNoteAddin::export_button_clicked()
 
   if (!error_message.empty())
   {
-    ERR_OUT("Could not export: %s", error_message.c_str());
+    ERR_OUT(_("Could not export: %s"), error_message.c_str());
 
     std::string msg = str(boost::format(
                             _("Could not save the file \"%s\"")) 

@@ -1,4 +1,4 @@
-AC_INIT(gnote, 3.9.0)
+AC_INIT(gnote, 3.9.1)
 AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR(README)
 AM_INIT_AUTOMAKE([1.11 foreign dist-bzip2])
@@ -61,6 +61,10 @@ LT_INIT([disable-static])
 
 AC_LANG_CPLUSPLUS
 AC_LANG_COMPILER_REQUIRE
+AC_CHECK_PROG(HAVE_DESKTOP_FILE_VALIDATE, [desktop-file-validate], [yes], [no])
+if test $HAVE_DESKTOP_FILE_VALIDATE == "no"; then
+  AC_MSG_ERROR([desktop-file-validate not found])
+fi
 
 GTK_CHECK_BACKEND([quartz], [3.0], [os_osx=yes], [os_osx=no])
 if test "$os_osx" = "yes"; then
@@ -179,7 +183,9 @@ src/addins/notedirectorywatcher/Makefile
 src/addins/noteoftheday/Makefile
 src/addins/printnotes/Makefile
 src/addins/replacetitle/Makefile
+src/addins/statistics/Makefile
 src/addins/stickynoteimport/Makefile
+src/addins/tableofcontent/Makefile
 src/addins/tomboyimport/Makefile
 src/addins/underline/Makefile
 src/addins/webdavsyncservice/Makefile

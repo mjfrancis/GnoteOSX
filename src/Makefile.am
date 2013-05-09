@@ -62,6 +62,7 @@ DBUS_SOURCES=remotecontrolproxy.hpp remotecontrolproxy.cpp \
 	dbus/iremotecontrol.hpp \
 	dbus/remotecontrol-client-glue.cpp \
 	dbus/remotecontrol-glue.cpp \
+	dbus/searchprovider.hpp dbus/searchprovider.cpp \
 	$(NULL)
 
 libgnote_la_LDFLAGS = -release @LIBGNOTE_RELEASE@ -version-info @LIBGNOTE_VERSION_INFO@
@@ -69,7 +70,6 @@ libgnote_la_LIBADD = $(LIBGNOTE_LIBS)
 libgnote_la_SOURCES = \
 	base/singleton.hpp \
 	base/macros.hpp \
-	base/inifile.hpp base/inifile.cpp \
 	gnome_keyring/keyringexception.hpp \
 	gnome_keyring/ring.hpp gnome_keyring/ring.cpp \
 	sharp/datetime.hpp sharp/datetime.cpp \
@@ -97,6 +97,7 @@ libgnote_la_SOURCES = \
 	sharp/xsltargumentlist.hpp sharp/xsltargumentlist.cpp \
 	sharp/xsltransform.hpp sharp/xsltransform.cpp \
 	abstractaddin.hpp abstractaddin.cpp \
+	addininfo.hpp addininfo.cpp \
 	addinmanager.hpp addinmanager.cpp \
 	addinpreferencefactory.hpp addinpreferencefactory.cpp \
 	applicationaddin.hpp \
@@ -159,7 +160,7 @@ gnote_SOURCES = \
 	synchronization/silentui.hpp synchronization/silentui.cpp \
 	synchronization/syncdialog.hpp synchronization/syncdialog.cpp \
 	synchronization/syncmanager.hpp synchronization/syncmanager.cpp \
-	$(DBUS_SOURCES)   \
+	$(DBUS_SOURCES) \
 	main.cpp \
 	$(NULL)
 

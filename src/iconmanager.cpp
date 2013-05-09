@@ -18,6 +18,7 @@
  */
 
 
+#include <glibmm/i18n.h>
 #include <gtkmm/icontheme.h>
 
 #include "debug.hpp"
@@ -59,9 +60,15 @@ Glib::RefPtr<Gdk::Pixbuf> IconManager::get_icon(const std::string & name, int si
     return pixbuf;
   }
   catch(const Glib::Exception & e) {
-    ERR_OUT("Failed to load icon (%s, %d): %s", name.c_str(), size, e.what().c_str());
+    /* TRANSLATORS: the first %s is icon name, %d is for size, last %s is error description */
+    ERR_OUT(_("Failed to load icon (%s, %d): %s"), name.c_str(), size, e.what().c_str());
   }
   return Glib::RefPtr<Gdk::Pixbuf>();
+}
+
+Gtk::IconInfo IconManager::lookup_icon(const std::string & name, int size)
+{
+  return Gtk::IconTheme::get_default()->lookup_icon(name, size, (Gtk::IconLookupFlags) 0);
 }
 
 }

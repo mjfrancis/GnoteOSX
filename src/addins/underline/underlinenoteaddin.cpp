@@ -1,7 +1,7 @@
 /*
  * gnote
  *
- * Copyright (C) 2010 Aurimas Cernius
+ * Copyright (C) 2010,2013 Aurimas Cernius
  * Copyright (C) 2009 Hubert Figuiere
  * Original C# file
  * (C) 2009 Mark Wakim <markwakim@gmail.com>
@@ -23,7 +23,6 @@
 
 // Translated from UnderlineNoteAddin.cs:
 
-#include <glibmm/i18n.h>
 
 #include "sharp/modulefactory.hpp"
 #include "underlinemenuitem.hpp"
@@ -37,32 +36,6 @@ namespace underline {
   {
     ADD_INTERFACE_IMPL(UnderlineNoteAddin);
     enabled(false);
-  }
-
-  const char * UnderlineModule::id() const
-  {
-    return "UnderlineAddin";
-  }
-  const char * UnderlineModule::name() const
-  {
-    // this is the name of the plugin.
-    return _("Underline");
-  }
-  const char * UnderlineModule::description() const
-  {
-    return _("Adds ability to underline text.");
-  }
-  const char * UnderlineModule::authors() const
-  {
-    return _("Hubert Figuière and the Tomboy Project");
-  }
-  int UnderlineModule::category() const
-  {
-    return gnote::ADDIN_CATEGORY_FORMATTING;
-  }
-  const char * UnderlineModule::version() const
-  {
-    return "0.1";
   }
 
 

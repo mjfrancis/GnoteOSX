@@ -11,7 +11,9 @@ SUBDIRS = backlinks \
 	noteoftheday \
 	printnotes \
 	replacetitle \
+	statistics \
 	stickynoteimport \
+	tableofcontent \
 	tomboyimport \
 	underline \
 	webdavsyncservice \

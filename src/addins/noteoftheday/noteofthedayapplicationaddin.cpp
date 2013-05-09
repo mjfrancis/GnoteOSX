@@ -19,7 +19,6 @@
  */
 
 #include <glibmm.h>
-#include <glibmm/i18n.h>
 
 #include "noteoftheday.hpp"
 #include "noteofthedayapplicationaddin.hpp"
@@ -34,31 +33,6 @@ NoteOfTheDayModule::NoteOfTheDayModule()
   ADD_INTERFACE_IMPL(NoteOfTheDayApplicationAddin);
   ADD_INTERFACE_IMPL(NoteOfTheDayPreferencesFactory);
   enabled(false);
-}
-const char * NoteOfTheDayModule::id() const
-{
-  return "NoteOfTheDayAddin";
-}
-const char * NoteOfTheDayModule::name() const
-{
-  return _("Note of the Day");
-}
-const char * NoteOfTheDayModule::description() const
-{
-  return _("Automatically creates a \"Today\" note for easily "
-           "jotting down daily thoughts");
-}
-const char * NoteOfTheDayModule::authors() const
-{
-  return _("Debarshi Ray and the Tomboy Project");
-}
-int NoteOfTheDayModule::category() const
-{
-  return gnote::ADDIN_CATEGORY_TOOLS;
-}
-const char * NoteOfTheDayModule::version() const
-{
-  return "0.1";
 }
 
 const char * NoteOfTheDayApplicationAddin::IFACE_NAME
