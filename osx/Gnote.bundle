@@ -63,6 +63,7 @@
 
   <!-- Copy in gio modules -->
   <binary>${prefix}/lib/gio/modules/*.so</binary>
+  <binary>${prefix}/lib/gio/modules/giomodule.cache</binary>
 
   <!-- Copy in girepository typelibs -->
   <data>${prefix}/lib/girepository-1.0</data>
