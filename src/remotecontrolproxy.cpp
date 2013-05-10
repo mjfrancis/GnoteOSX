@@ -151,8 +151,8 @@ void RemoteControlProxy::on_name_lost(const Glib::RefPtr<Gio::DBus::Connection> 
 
 void RemoteControlProxy::load_introspection_xml()
 {
-  load_interface_from_file(utils::get_sharedir() + "/gnote/gnote-introspect.xml", GNOTE_INTERFACE_NAME, s_gnote_interface);
-  load_interface_from_file(utils::get_sharedir() + "/gnote/shell-search-provider-dbus-interfaces.xml",
+  load_interface_from_file((utils::get_sharedir() + "/gnote/gnote-introspect.xml").c_str(), GNOTE_INTERFACE_NAME, s_gnote_interface);
+  load_interface_from_file((utils::get_sharedir() + "/gnote/shell-search-provider-dbus-interfaces.xml").c_str(),
                            GNOTE_SEARCH_PROVIDER_INTERFACE_NAME, s_search_provider_interface);
 }
 
