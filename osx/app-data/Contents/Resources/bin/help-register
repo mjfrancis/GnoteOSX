@@ -1,0 +1,6 @@
+#!/usr/bin/python
+import os
+from Carbon import AH
+path = os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../..")
+AH.AHRegisterHelpBook(path)
+

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Help
+GenericName=Help
+Comment=Help
+Exec=help-open %u
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/help;

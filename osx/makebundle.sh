@@ -1,15 +1,5 @@
 #!/bin/bash
 
-if [ -d Gnote.app ] && [ "$1x" = "-fx" ]; then
-	rm -rf Gnote.app
-fi
-
-if [ ! -d Gnote.app ]; then
-    gtk-mac-bundler Gnote.bundle
-else
-	echo "Note Gnote.app bundle already exists, only stripping it..."
-fi
-
 function do_strip {
     tp=$(file -b --mime-type "$1")
 
@@ -43,12 +33,50 @@ function strip_binaries {
 
 }
 
-echo "Removing unnecessary files from bundle"
-rm -rf Gnote.app/Contents/Resources/share/themes/Adwaita/gtk-2.0
-rm -rf Gnote.app/Contents/Resources/share/themes/Default/gtk-2.0-key
+function install_help_files_for_language {
+    current="$PWD"
+    target="Gnote.app/Contents/Resources/$2.lproj/Gnote.help"
+    mkdir -p "$target"
+    pushd "$PWD" > /dev/null
+    cd "$target"
+    yelp-build html "$current/../help/$1"
+    popd > /dev/null
+    cp ../data/icons/hicolor_apps_16x16_gnote.png "Gnote.app/Contents/Resources/$2.lproj/Gnote.help/"
+    sed -e 's/^<head>$/<head><meta name="AppleTitle" Content="Gnote Help"><meta name="AppleIcon" content="hicolor_apps_16x16_gnote.png">/g' -i "" "Gnote.app/Contents/Resources/$2.lproj/Gnote.help/index.html"
+    hiutil -Cgf "Gnote.app/Contents/Resources/$2.lproj/Gnote.help/Gnote.helpindex" "Gnote.app/Contents/Resources/$2.lproj/Gnote.help"
+}
 
-echo "Installing gdk-pixbuf loader cache"
-gdk-pixbuf-query-loaders | sed -e 's|.*\(/gdk-pixbuf-2.0/[^/]*/loaders/[^/]*\)$|"@executable_path/../Resources/lib\1|g' > Gnote.app/Contents/Resources/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
+function install_help_files {
+    echo "Installing help files for en"
+    install_help_files_for_language "C" "en"
+    for l in $(find ../help -type d -maxdepth 1 -not -name C -not -name help | sed -e "s#^.*/##g"); do
+        echo "Installing help files for $l"
+        install_help_files_for_language "$l" "$l"
+    done
+}
+
+
+
+if [ -d Gnote.app ] && [ "$1x" = "-fx" ]; then
+	rm -rf Gnote.app
+fi
+
+if [ ! -d Gnote.app ]; then
+    gtk-mac-bundler Gnote.bundle
+
+    echo "Removing unnecessary files from bundle"
+    rm -rf Gnote.app/Contents/Resources/share/themes/Adwaita/gtk-2.0
+    rm -rf Gnote.app/Contents/Resources/share/themes/Default/gtk-2.0-key
+
+    echo "Installing gdk-pixbuf loader cache"
+    gdk-pixbuf-query-loaders | sed -e 's|.*\(/gdk-pixbuf-2.0/[^/]*/loaders/[^/]*\)$|"@executable_path/../Resources/lib\1|g' > Gnote.app/Contents/Resources/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
+
+    echo "Installing help files"
+    install_help_files
+
+else
+	echo "Note Gnote.app bundle already exists, only stripping it..."
+fi
 
 echo "Strip debug symbols from bundle binaries"
 strip_binaries

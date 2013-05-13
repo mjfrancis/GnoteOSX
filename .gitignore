@@ -87,6 +87,8 @@ po/*.gmo
 po/*.pot
 osx/Gnote.app
 osx/Info.plist
+!osx/app-data/Contents/Resources/share/applications/help.desktop
+!osx/app-data/Contents/Resources/share/applications/open.desktop
 .DS_Store
 .DS_Store?
 

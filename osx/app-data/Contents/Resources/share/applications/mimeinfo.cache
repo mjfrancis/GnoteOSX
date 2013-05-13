@@ -1,2 +1,3 @@
 [MIME Cache]
 x-scheme-handler/http=open.desktop;
+x-scheme-handler/help=help.desktop;

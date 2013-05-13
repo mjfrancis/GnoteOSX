@@ -79,6 +79,8 @@ fi
 export DBUS_SESSION_BUS_PID
 export DBUS_SESSION_BUS_ADDRESS
 
+help-register
+
 if [ "x$GTK_DEBUG_SHELL" != "x" ]; then
 	exec bash
 else

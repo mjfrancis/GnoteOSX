@@ -26,5 +26,9 @@
 	<string>Copyright 2013 Gnote, GNU General Public License.</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.7</string>
+	<key>CFBundleHelpBookFolder</key>
+	<string>Gnote.help</string>
+	<key>CFBundleHelpBookName</key>
+	<string>Gnote Help</string>
 </dict>
 </plist>

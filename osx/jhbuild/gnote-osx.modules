@@ -186,6 +186,16 @@
     </dependencies>
   </autotools>
 
+  <!-- Needed by gnote -->
+  <tarball id="desktop-file-utils" version="0.16">
+    <source href="http://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.16.tar.bz2"
+            hash="sha256:7960be4bf7aa4b4698e8ea333cfa0bbfa7a169029e85d6a8b5390f625155c9a3"
+            md5sum="6811712bced796d025d1a8a0f728d941" size="282640"/>
+    <dependencies>
+      <dep package="glib"/>
+    </dependencies>
+  </tarball>
+
   <!-- 4. Gnote itself -->
   <autotools id="gnote">
     <branch repo="github.com" module="mjfrancis/GnoteOSX" version="master"/>
