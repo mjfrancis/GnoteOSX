@@ -1,0 +1,1107 @@
+--- gtk+-3.6.4-orig/configure.ac	2013-01-07 18:50:02.000000000 +0800
++++ gtk+-3.6.4/configure.ac	2013-05-14 11:47:42.000000000 +0800
+@@ -366,6 +366,7 @@
+ if test "x$enable_quartz_backend" = xyes; then
+   cairo_backends="$cairo_backends cairo-quartz"
+   GDK_BACKENDS="$GDK_BACKENDS quartz"
++  backend_immodules="$backend_immodules,quartz"
+   GDK_WINDOWING="$GDK_WINDOWING
+ #define GDK_WINDOWING_QUARTZ"
+   GDK_EXTRA_LIBS="$GDK_EXTRA_LIBS -framework Cocoa"
+@@ -885,6 +886,7 @@
+ AM_CONDITIONAL(INCLUDE_IM_INUKTITUT, [test x"$INCLUDE_inuktitut" = xyes])
+ AM_CONDITIONAL(INCLUDE_IM_IPA, [test x"$INCLUDE_ipa" = xyes])
+ AM_CONDITIONAL(INCLUDE_IM_MULTIPRESS, [test x"$INCLUDE_multipress" = xyes])
++AM_CONDITIONAL(INCLUDE_IM_QUARTZ, [test x"$INCLUDE_quartz" = xyes])
+ AM_CONDITIONAL(INCLUDE_IM_THAI, [test x"$INCLUDE_thai" = xyes])
+ AM_CONDITIONAL(INCLUDE_IM_TI_ER, [test x"$INCLUDE_ti_er" = xyes])
+ AM_CONDITIONAL(INCLUDE_IM_TI_ET, [test x"$INCLUDE_ti_et" = xyes])
+--- gtk+-3.6.4-orig/gdk/quartz/GdkQuartzView.c	2013-01-04 06:44:36.000000000 +0800
++++ gtk+-3.6.4/gdk/quartz/GdkQuartzView.c	2013-05-14 11:48:06.000000000 +0800
+@@ -23,18 +23,507 @@
+ 
+ @implementation GdkQuartzView
+ 
++-(id)initWithFrame: (NSRect)frameRect
++{
++  if ((self = [super initWithFrame: frameRect]))
++    {
++      markedRange = NSMakeRange (NSNotFound, 0);
++      selectedRange = NSMakeRange (NSNotFound, 0);
++    }
++
++  return self;
++}
++
++-(BOOL)acceptsFirstResponder
++{
++  GDK_NOTE (EVENTS, g_print ("acceptsFirstResponder\n"));
++  return YES;
++}
++
++-(BOOL)becomeFirstResponder
++{
++  GDK_NOTE (EVENTS, g_print ("becomeFirstResponder\n"));
++  return YES;
++}
++
++-(BOOL)resignFirstResponder
++{
++  GDK_NOTE (EVENTS, g_print ("resignFirstResponder\n"));
++  return YES;
++}
++
++-(void) keyDown: (NSEvent *) theEvent
++{
++  GDK_NOTE (EVENTS, g_print ("keyDown\n"));
++  [self interpretKeyEvents: [NSArray arrayWithObject: theEvent]];
++}
++
++-(void)flagsChanged: (NSEvent *) theEvent
++{
++}
++
++-(NSUInteger)characterIndexForPoint: (NSPoint)aPoint
++{
++  GDK_NOTE (EVENTS, g_print ("characterIndexForPoint\n"));
++  return 0;
++}
++
++-(NSRect)firstRectForCharacterRange: (NSRange)aRange actualRange: (NSRangePointer)actualRange
++{
++  GDK_NOTE (EVENTS, g_print ("firstRectForCharacterRange\n"));
++  gint ns_x, ns_y;
++  GdkRectangle *rect;
++
++  rect = g_object_get_data (G_OBJECT (gdk_window), GIC_CURSOR_RECT);
++  if (rect)
++    {
++      _gdk_quartz_window_gdk_xy_to_xy (rect->x, rect->y + rect->height,
++				       &ns_x, &ns_y);
++
++      return NSMakeRect (ns_x, ns_y, rect->width, rect->height);
++    }
++  else
++    {
++      return NSMakeRect (0, 0, 0, 0);
++    }
++}
++
++-(NSArray *)validAttributesForMarkedText
++{
++  GDK_NOTE (EVENTS, g_print ("validAttributesForMarkedText\n"));
++  return [NSArray arrayWithObjects: NSUnderlineStyleAttributeName, nil];
++}
++
++-(NSAttributedString *)attributedSubstringForProposedRange: (NSRange)aRange actualRange: (NSRangePointer)actualRange
++{
++  GDK_NOTE (EVENTS, g_print ("attributedSubstringForProposedRange\n"));
++  return nil;
++}
++
++-(BOOL)hasMarkedText
++{
++  GDK_NOTE (EVENTS, g_print ("hasMarkedText\n"));
++  return markedRange.location != NSNotFound && markedRange.length != 0;
++}
++
++-(NSRange)markedRange
++{
++  GDK_NOTE (EVENTS, g_print ("markedRange\n"));
++  return markedRange;
++}
++
++-(NSRange)selectedRange
++{
++  GDK_NOTE (EVENTS, g_print ("selectedRange\n"));
++  return selectedRange;
++}
++
++-(void)unmarkText
++{
++  GDK_NOTE (EVENTS, g_print ("unmarkText\n"));
++  markedRange = selectedRange = NSMakeRange (NSNotFound, 0);
++}
++
++-(void)setMarkedText: (id)aString selectedRange: (NSRange)newSelection replacementRange: (NSRange)replacementRange
++{
++  GDK_NOTE (EVENTS, g_print ("setMarkedText\n"));
++  const char *str;
++  char *prev_str;
++
++  if (replacementRange.location == NSNotFound)
++    {
++      markedRange = NSMakeRange (newSelection.location, [aString length]);
++      selectedRange = NSMakeRange (newSelection.location, newSelection.length);
++    }
++  else {
++      markedRange = NSMakeRange (replacementRange.location, [aString length]);
++      selectedRange = NSMakeRange (replacementRange.location + newSelection.location, newSelection.length);
++    }
++
++  if ([aString isKindOfClass: [NSAttributedString class]])
++    {
++      str = [[aString string] UTF8String];
++    }
++  else {
++      str = [aString UTF8String];
++    }
++
++  prev_str = g_object_get_data (G_OBJECT (gdk_window), TIC_MARKED_TEXT);
++  if (prev_str)
++    g_free (prev_str);
++  g_object_set_data (G_OBJECT (gdk_window), TIC_MARKED_TEXT, g_strdup (str));
++  g_object_set_data (G_OBJECT (gdk_window), TIC_SELECTED_POS,
++		     GUINT_TO_POINTER (selectedRange.location));
++  g_object_set_data (G_OBJECT (gdk_window), TIC_SELECTED_LEN,
++		     GUINT_TO_POINTER (selectedRange.length));
++
++  GDK_NOTE (EVENTS, g_print ("setMarkedText: set %s (%p, nsview %p): %s\n",
++			     TIC_MARKED_TEXT, gdk_window, self,
++			     str ? str : "(empty)"));
++}
++
++-(void)doCommandBySelector: (SEL)aSelector
++{
++  GDK_NOTE (EVENTS, g_print ("doCommandBySelector\n"));
++  [super doCommandBySelector: aSelector];
++}
++
++-(void)insertText: (id)aString replacementRange: (NSRange)replacementRange
++{
++  GDK_NOTE (EVENTS, g_print ("insertText\n"));
++  const char *str;
++  char *prev_str;
++
++  if ([self hasMarkedText])
++    [self unmarkText];
++
++  if ([aString isKindOfClass: [NSAttributedString class]])
++    {
++      str = [[aString string] UTF8String];
++    }
++  else
++    {
++      str = [aString UTF8String];
++    }
++
++  prev_str = g_object_get_data (G_OBJECT (gdk_window), TIC_INSERT_TEXT);
++  if (prev_str)
++    g_free (prev_str);
++  g_object_set_data (G_OBJECT (gdk_window), TIC_INSERT_TEXT, g_strdup (str));
++  GDK_NOTE (EVENTS, g_print ("insertText: set %s (%p, nsview %p): %s\n",
++			     TIC_INSERT_TEXT, gdk_window, self,
++			     str ? str : "(empty)"));
++
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_FILTERED));
++}
++
++-(void)deleteBackward: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("deleteBackward\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)deleteForward: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("deleteForward\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)deleteToBeginningOfLine: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("deleteToBeginningOfLine\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)deleteToEndOfLine: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("deleteToEndOfLine\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)deleteWordBackward: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("deleteWordBackward\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)deleteWordForward: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("deleteWordForward\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)insertBacktab: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("insertBacktab\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)insertNewline: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("insertNewline\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY, GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)insertTab: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("insertTab\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveBackward: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveBackward\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveBackwardAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveBackwardAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveDown: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveDown\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveDownAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveDownAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveForward: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveForward\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveForwardAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveForwardAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveLeft: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveLeft\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveLeftAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveLeftAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveRight: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveRight\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveRightAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveRightAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveToBeginningOfDocument: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveToBeginningOfDocument\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveToBeginningOfDocumentAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveToBeginningOfDocumentAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveToBeginningOfLine: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveToBeginningOfLine\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveToBeginningOfLineAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveToBeginningOfLineAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveToEndOfDocument: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveToEndOfDocument\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveToEndOfDocumentAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveToEndOfDocumentAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveToEndOfLine: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveToEndOfLine\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveToEndOfLineAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveToEndOfLineAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveUp: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveUp\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveUpAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveUpAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveWordBackward: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveWordBackward\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveWordBackwardAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveWordBackwardAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveWordForward: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveWordForward\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveWordForwardAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveWordForwardAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveWordLeft: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveWordLeft\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveWordLeftAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveWordLeftAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveWordRight: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveWordRight\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)moveWordRightAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("moveWordRightAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)pageDown: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("pageDown\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)pageDownAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("pageDownAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)pageUp: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("pageUp\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)pageUpAndModifySelection: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("pageUpAndModifySelection\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)selectAll: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("selectAll\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)selectLine: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("selectLine\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)selectWord: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("selectWord\n"));
++  g_object_set_data (G_OBJECT (gdk_window), GIC_FILTER_KEY,
++		     GUINT_TO_POINTER (GIC_FILTER_PASSTHRU));
++}
++
++-(void)noop: (id)sender
++{
++  GDK_NOTE (EVENTS, g_print ("noop\n"));
++}
++
++/* --------------------------------------------------------------- */
++
+ -(void)dealloc
+ {
+   if (trackingRect)
+     {
+-      [self removeTrackingRect:trackingRect];
++      [self removeTrackingRect: trackingRect];
+       trackingRect = 0;
+     }
+ 
+   [super dealloc];
+ }
+ 
+--(void)setGdkWindow:(GdkWindow *)window
++-(void)setGdkWindow: (GdkWindow *)window
+ {
+   gdk_window = window;
+ }
+@@ -60,10 +549,11 @@
+     return YES;
+ 
+   /* A view is opaque if its GdkWindow doesn't have the RGBA visual */
+-  return gdk_window_get_visual (gdk_window) != gdk_screen_get_rgba_visual (_gdk_screen);
++  return gdk_window_get_visual (gdk_window) !=
++    gdk_screen_get_rgba_visual (_gdk_screen);
+ }
+ 
+--(void)drawRect:(NSRect)rect 
++-(void)drawRect: (NSRect)rect 
+ {
+   GdkRectangle gdk_rect;
+   GdkWindowImplQuartz *impl = GDK_WINDOW_IMPL_QUARTZ (gdk_window->impl);
+@@ -75,7 +565,7 @@
+   if (GDK_WINDOW_DESTROYED (gdk_window))
+     return;
+ 
+-  if (!(gdk_window->event_mask & GDK_EXPOSURE_MASK))
++  if (! (gdk_window->event_mask & GDK_EXPOSURE_MASK))
+     return;
+ 
+   if (NSEqualRects (rect, NSZeroRect))
+@@ -93,7 +583,7 @@
+       [NSGraphicsContext saveGraphicsState];
+ 
+       [[NSColor windowBackgroundColor] setFill];
+-      [NSBezierPath fillRect:rect];
++      [NSBezierPath fillRect: rect];
+ 
+       [NSGraphicsContext restoreGraphicsState];
+ 
+@@ -107,9 +597,9 @@
+       impl->needs_display_region = NULL;
+     }
+ 
+-  [self getRectsBeingDrawn:&drawn_rects count:&count];
++  [self getRectsBeingDrawn: &drawn_rects count: &count];
+   region = cairo_region_create ();
+-  
++
+   for (i = 0; i < count; i++)
+     {
+       gdk_rect.x = drawn_rects[i].origin.x;
+@@ -133,7 +623,7 @@
+     }
+ }
+ 
+--(void)setNeedsInvalidateShadow:(BOOL)invalidate
++-(void)setNeedsInvalidateShadow: (BOOL)invalidate
+ {
+   needsInvalidateShadow = invalidate;
+ }
+@@ -151,7 +641,7 @@
+ 
+   if (trackingRect)
+     {
+-      [self removeTrackingRect:trackingRect];
++      [self removeTrackingRect: trackingRect];
+       trackingRect = 0;
+     }
+ 
+@@ -163,32 +653,32 @@
+    */
+ 
+   rect = [self bounds];
+-  trackingRect = [self addTrackingRect:rect
+-                                 owner:self
+-                              userData:nil
+-                          assumeInside:NO];
++  trackingRect = [self addTrackingRect: rect
++		  owner: self
++		  userData: nil
++		  assumeInside: NO];
+ }
+ 
+ -(void)viewDidMoveToWindow
+ {
+   if (![self window]) /* We are destroyed already */
+-      return;
++    return;
+ 
+   [self updateTrackingRect];
+ }
+ 
+--(void)viewWillMoveToWindow:(NSWindow *)newWindow
++-(void)viewWillMoveToWindow: (NSWindow *)newWindow
+ {
+   if (newWindow == nil && trackingRect)
+     {
+-      [self removeTrackingRect:trackingRect];
++      [self removeTrackingRect: trackingRect];
+       trackingRect = 0;
+     }
+ }
+ 
+--(void)setFrame:(NSRect)frame
++-(void)setFrame: (NSRect)frame
+ {
+-  [super setFrame:frame];
++  [super setFrame: frame];
+ 
+   if ([self window])
+     [self updateTrackingRect];
+--- gtk+-3.6.4-orig/gdk/quartz/GdkQuartzView.h	2012-11-19 22:32:20.000000000 +0800
++++ gtk+-3.6.4/gdk/quartz/GdkQuartzView.h	2013-05-14 11:48:41.000000000 +0800
+@@ -17,17 +17,32 @@
+  */
+ 
+ #import <AppKit/AppKit.h>
+-#include "gdkwindow.h"
++#include "gdk/gdk.h"
+ 
+-@interface GdkQuartzView : NSView {
++/* Text Input Client */
++#define TIC_MARKED_TEXT "tic-marked-text"
++#define TIC_SELECTED_POS  "tic-selected-pos"
++#define TIC_SELECTED_LEN  "tic-selected-len"
++#define TIC_INSERT_TEXT "tic-insert-text"
++
++/* GtkIMContext */
++#define GIC_CURSOR_RECT  "gic-cursor-rect"
++#define GIC_FILTER_KEY   "gic-filter-key"
++#define GIC_FILTER_PASSTHRU	0
++#define GIC_FILTER_FILTERED	1
++
++@interface GdkQuartzView : NSView <NSTextInputClient>
++{
+   GdkWindow *gdk_window;
+   NSTrackingRectTag trackingRect;
+   BOOL needsInvalidateShadow;
++  NSRange markedRange;
++  NSRange selectedRange;
+ }
+ 
+--(void)setGdkWindow:(GdkWindow *)window;
+--(GdkWindow *)gdkWindow;
+--(NSTrackingRectTag)trackingRect;
+--(void)setNeedsInvalidateShadow:(BOOL)invalidate;
++- (void)setGdkWindow: (GdkWindow *)window;
++- (GdkWindow *)gdkWindow;
++- (NSTrackingRectTag)trackingRect;
++- (void)setNeedsInvalidateShadow: (BOOL)invalidate;
+ 
+ @end
+--- gtk+-3.6.4-orig/modules/input/Makefile.am	2012-11-19 22:32:21.000000000 +0800
++++ gtk+-3.6.4/modules/input/Makefile.am	2013-05-14 11:48:59.000000000 +0800
+@@ -151,6 +151,17 @@
+ endif
+ endif
+ 
++im_quartz_la_CPPFLAGS = $(AM_CPPFLAGS) -xobjective-c
++im_quartz_la_LDFLAGS = -rpath $(moduledir) -avoid-version -module $(no_undefined)
++im_quartz_la_SOURCES = imquartz.c
++libstatic_im_quartz_la_SOURCES = $(im_quartz_la_SOURCES)
++im_quartz_la_LIBADD = $(LDADDS)
++if INCLUDE_IM_QUARTZ
++STATIC_QUARTZ_MODULE = libstatic-im-quartz.la
++else
++QUARTZ_MODULE = im-quartz.la
++endif
++
+ multipress_defs = -DMULTIPRESS_LOCALEDIR=\""$(mplocaledir)"\" -DMULTIPRESS_CONFDIR=\""$(sysconfdir)/gtk-2.0"\"
+ im_multipress_la_CPPFLAGS = $(AM_CPPFLAGS) $(multipress_defs)
+ libstatic_im_multipress_la_CPPFLAGS = $(im_multipress_la_CPPFLAGS)
+@@ -210,6 +221,7 @@
+ 	$(INUKTITUT_MODULE)		\
+ 	$(IPA_MODULE)			\
+ 	$(MULTIPRESS_MODULE)		\
++	$(QUARTZ_MODULE)		\
+ 	$(THAI_MODULE)			\
+ 	$(TI_ER_MODULE)			\
+ 	$(TI_ET_MODULE)			\
+@@ -226,6 +238,7 @@
+ 	$(STATIC_INUKTITUT_MODULE)		\
+ 	$(STATIC_IPA_MODULE)			\
+ 	$(STATIC_MULTIPRESS_MODULE)		\
++	$(STATIC_QUARTZ_MODULE)			\
+ 	$(STATIC_THAI_MODULE)			\
+ 	$(STATIC_TI_ER_MODULE)			\
+ 	$(STATIC_TI_ET_MODULE)			\
+--- gtk+-3.6.4-orig/modules/input/imquartz.c	1970-01-01 08:30:00.000000000 +0830
++++ gtk+-3.6.4/modules/input/imquartz.c	2013-05-14 11:49:09.000000000 +0800
+@@ -0,0 +1,393 @@
++/*
++ * gtkimmodulequartz
++ * Copyright (C) 2011 Hiroyuki Yamamoto
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, write to the
++ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
++ * Boston, MA 02111-1307, USA.
++ *
++ * $Id:$
++ */
++
++#include "config.h"
++#include <string.h>
++
++#include <gtk/gtk.h>
++#include "gtk/gtkintl.h"
++#include "gtk/gtkimmodule.h"
++
++#include "gdk/quartz/gdkquartz.h"
++#include "gdk/quartz/GdkQuartzView.h"
++
++#define GTK_IM_CONTEXT_TYPE_QUARTZ (type_quartz)
++#define GTK_IM_CONTEXT_QUARTZ(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_IM_CONTEXT_TYPE_QUARTZ, GtkIMContextQuartz))
++#define GTK_IM_CONTEXT_QUARTZ_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS((obj), GTK_IM_CONTEXT_TYPE_QUARTZ, GtkIMContextQuartzClass))
++
++typedef struct _GtkIMContextQuartz
++{
++  GtkIMContext parent;
++  GtkIMContext *slave;
++  GdkWindow *client_window;
++  gchar *preedit_str;
++  unsigned int cursor_index;
++  unsigned int selected_len;
++  GdkRectangle *cursor_rect;
++  gboolean focused;
++} GtkIMContextQuartz;
++
++typedef struct _GtkIMContextQuartzClass
++{
++  GtkIMContextClass parent_class;
++} GtkIMContextQuartzClass;
++
++GType type_quartz = 0;
++static GObjectClass *parent_class;
++
++static const GtkIMContextInfo imquartz_info =
++{
++  "quartz",
++  "Mac OS X Quartz",
++  GETTEXT_PACKAGE,
++  GTK_LOCALEDIR,
++  "ja:ko:zh:*",
++};
++
++static const GtkIMContextInfo *info_list[] =
++{
++  &imquartz_info,
++};
++
++#ifndef INCLUDE_IM_quartz
++#define MODULE_ENTRY(type,function) G_MODULE_EXPORT type im_module_ ## function
++#else
++#define MODULE_ENTRY(type, function) type _gtk_immodule_quartz_ ## function
++#endif
++
++static void
++quartz_get_preedit_string (GtkIMContext *context,
++                           gchar **str,
++                           PangoAttrList **attrs,
++                           gint *cursor_pos)
++{
++  GtkIMContextQuartz *qc = GTK_IM_CONTEXT_QUARTZ (context);
++
++  GTK_NOTE (MISC, g_print ("quartz_get_preedit_string\n"));
++
++  if (str)
++    *str = qc->preedit_str ? g_strdup (qc->preedit_str) : g_strdup ("");
++
++  if (attrs)
++    {
++      *attrs = pango_attr_list_new ();
++      int len = g_utf8_strlen (*str, -1);
++      gchar *ch = *str;
++      if (len > 0)
++        {
++          PangoAttribute *attr;
++          int i = 0;
++          for (;;)
++            {
++              gchar *s = ch;
++              ch = g_utf8_next_char (ch);
++
++              if (i >= qc->cursor_index &&
++		  i < qc->cursor_index + qc->selected_len)
++                attr = pango_attr_underline_new (PANGO_UNDERLINE_DOUBLE);
++              else
++                attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
++
++              attr->start_index = s - *str;
++              if (!*ch)
++                attr->end_index = attr->start_index + strlen (s);
++              else
++                attr->end_index = ch - *str;
++
++              pango_attr_list_change (*attrs, attr);
++
++              if (!*ch)
++                break;
++              i++;
++            }
++        }
++    }
++  if (cursor_pos)
++    *cursor_pos = qc->cursor_index;
++}
++
++static gboolean
++quartz_filter_keypress (GtkIMContext *context,
++                        GdkEventKey *event)
++{
++  GtkIMContextQuartz *qc = GTK_IM_CONTEXT_QUARTZ (context);
++  gboolean retval = FALSE;
++  NSView *nsview;
++  GdkWindow *win;
++  gchar *fixed_str, *marked_str;
++
++  GTK_NOTE (MISC, g_print ("quartz_filter_keypress\n"));
++
++  if (event->type == GDK_KEY_RELEASE)
++    return FALSE;
++
++  if (!qc->client_window)
++    return FALSE;
++
++  nsview = gdk_quartz_window_get_nsview (qc->client_window);
++  if (GDK_IS_WINDOW (nsview))
++       /* it gets GDK_WINDOW in some cases */
++    return gtk_im_context_filter_keypress (qc->slave, event);
++  else
++    win = (GdkWindow *)[ (GdkQuartzView *)nsview gdkWindow];
++  GTK_NOTE (MISC, g_print ("client_window: %p, win: %p, nsview: %p\n",
++			   qc->client_window, win, nsview));
++
++  if (event->hardware_keycode == 55)	/* Command */
++    return FALSE;
++
++  NSEvent *nsevent = gdk_quartz_event_get_nsevent ((GdkEvent *)event);
++  NSEventType etype = [nsevent type];
++  if (etype == NSKeyDown)
++       [nsview keyDown: nsevent];
++  /* JIS_Eisu || JIS_Kana */
++  if (event->hardware_keycode == 102 || event->hardware_keycode == 104)
++    return FALSE;
++
++  GTK_NOTE (MISC,
++	    g_print ("quartz_filter_keypress: getting tic-insert-text\n"));
++  fixed_str = g_object_get_data (G_OBJECT (win), TIC_INSERT_TEXT);
++  marked_str = g_object_get_data (G_OBJECT (win), TIC_MARKED_TEXT);
++  if (fixed_str)
++    {
++      GTK_NOTE (MISC, g_print ("tic-insert-text: %s\n", fixed_str));
++      g_free (qc->preedit_str);
++      qc->preedit_str = NULL;
++      g_object_set_data (G_OBJECT (win), TIC_INSERT_TEXT, NULL);
++      g_signal_emit_by_name (context, "commit", fixed_str);
++      g_signal_emit_by_name (context, "preedit_changed");
++
++      unsigned int filtered =
++	   GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (win),
++						GIC_FILTER_KEY));
++      GTK_NOTE (MISC, g_print ("filtered, %d\n", filtered));
++      if (filtered)
++        retval = TRUE;
++      else
++        retval = FALSE;
++    }
++  if (marked_str)
++    {
++      GTK_NOTE (MISC, g_print ("tic-marked-text: %s\n", marked_str));
++      qc->cursor_index =
++	   GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (win),
++						TIC_SELECTED_POS));
++      qc->selected_len =
++	   GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (win),
++						TIC_SELECTED_LEN));
++      g_free (qc->preedit_str);
++      qc->preedit_str = g_strdup (marked_str);
++      g_object_set_data (G_OBJECT (win), TIC_MARKED_TEXT, NULL);
++      g_signal_emit_by_name (context, "preedit_changed");
++      retval = TRUE;
++    }
++  g_free (fixed_str);
++  g_free (marked_str);
++
++  GTK_NOTE (MISC, g_print ("quartz_filter_keypress done\n"));
++  return retval;
++}
++
++static void
++quartz_reset (GtkIMContext *context)
++{
++  GTK_NOTE (MISC, g_print ("quartz_reset\n"));
++}
++
++static void
++quartz_set_client_window (GtkIMContext *context, GdkWindow *window)
++{
++  GtkIMContextQuartz *qc = GTK_IM_CONTEXT_QUARTZ (context);
++
++  GTK_NOTE (MISC, g_print ("quartz_set_client_window: %p\n", window));
++
++  qc->client_window = window;
++}
++
++static void
++quartz_focus_in (GtkIMContext *context)
++{
++  GTK_NOTE (MISC, g_print ("quartz_focus_in\n"));
++
++  GtkIMContextQuartz *qc = GTK_IM_CONTEXT_QUARTZ (context);
++  qc->focused = TRUE;
++}
++
++static void
++quartz_focus_out (GtkIMContext *context)
++{
++  GTK_NOTE (MISC, g_print ("quartz_focus_out\n"));
++
++  GtkIMContextQuartz *qc = GTK_IM_CONTEXT_QUARTZ (context);
++  qc->focused = FALSE;
++}
++
++static void
++quartz_set_cursor_location (GtkIMContext *context, GdkRectangle *area)
++{
++  GtkIMContextQuartz *qc = GTK_IM_CONTEXT_QUARTZ (context);
++  gint x, y;
++  NSView *nsview;
++  GdkWindow *win;
++
++  GTK_NOTE (MISC, g_print ("quartz_set_cursor_location\n"));
++
++  if (!qc->client_window)
++    return;
++
++  if (!qc->focused)
++    return;
++
++  qc->cursor_rect->x = area->x;
++  qc->cursor_rect->y = area->y;
++  qc->cursor_rect->width = area->width;
++  qc->cursor_rect->height = area->height;
++
++  gdk_window_get_origin (qc->client_window, &x, &y);
++
++  qc->cursor_rect->x = area->x + x;
++  qc->cursor_rect->y = area->y + y;
++
++  nsview = gdk_quartz_window_get_nsview (qc->client_window);
++  if (GDK_IS_WINDOW (nsview))
++    /* it returns GDK_WINDOW in some cases */
++    return;
++
++  win = (GdkWindow *)[ (GdkQuartzView*)nsview gdkWindow];
++  g_object_set_data (G_OBJECT (win), GIC_CURSOR_RECT, qc->cursor_rect);
++}
++
++static void
++quartz_set_use_preedit (GtkIMContext *context, gboolean use_preedit)
++{
++  GTK_NOTE (MISC, g_print ("quartz_set_use_preedit: %d\n", use_preedit));
++}
++
++static void
++commit_cb (GtkIMContext *context, const gchar *str, GtkIMContextQuartz *qc)
++{
++  g_signal_emit_by_name (qc, "commit", str);
++}
++
++static void
++imquartz_finalize (GObject *obj)
++{
++  GTK_NOTE (MISC, g_print ("imquartz_finalize\n"));
++
++  GtkIMContextQuartz *qc = GTK_IM_CONTEXT_QUARTZ (obj);
++  g_free (qc->preedit_str);
++  qc->preedit_str = NULL;
++  g_free (qc->cursor_rect);
++  qc->cursor_rect = NULL;
++
++  g_signal_handlers_disconnect_by_func (qc->slave, (gpointer)commit_cb, qc);
++  g_object_unref (qc->slave);
++
++  parent_class->finalize (obj);
++}
++
++static void
++gtk_im_context_quartz_class_init (GtkIMContextClass *klass)
++{
++  GTK_NOTE (MISC, g_print ("gtk_im_context_quartz_class_init\n"));
++
++  GObjectClass *object_class = G_OBJECT_CLASS (klass);
++  parent_class = g_type_class_peek_parent (klass);
++
++  klass->get_preedit_string = quartz_get_preedit_string;
++  klass->filter_keypress = quartz_filter_keypress;
++  klass->reset = quartz_reset;
++  klass->set_client_window = quartz_set_client_window;
++  klass->focus_in = quartz_focus_in;
++  klass->focus_out = quartz_focus_out;
++  klass->set_cursor_location = quartz_set_cursor_location;
++  klass->set_use_preedit = quartz_set_use_preedit;
++
++  object_class->finalize = imquartz_finalize;
++}
++
++static void
++gtk_im_context_quartz_init (GtkIMContext *im_context)
++{
++  GTK_NOTE (MISC, g_print ("gtk_im_context_quartz_init\n"));
++
++  GtkIMContextQuartz *qc = GTK_IM_CONTEXT_QUARTZ (im_context);
++  qc->preedit_str = g_strdup ("");
++  qc->cursor_index = 0;
++  qc->selected_len = 0;
++  qc->cursor_rect = g_malloc (sizeof (GdkRectangle));
++  qc->focused = FALSE;
++
++  qc->slave = g_object_new (GTK_TYPE_IM_CONTEXT_SIMPLE, NULL);
++  g_signal_connect (G_OBJECT (qc->slave), "commit", G_CALLBACK (commit_cb), qc);
++}
++
++static void
++gtk_im_context_quartz_register_type (GTypeModule *module)
++{
++  const GTypeInfo object_info =
++  {
++    sizeof (GtkIMContextQuartzClass),
++    (GBaseInitFunc) NULL,
++    (GBaseFinalizeFunc) NULL,
++    (GClassInitFunc) gtk_im_context_quartz_class_init,
++    NULL,           /* class_finalize */
++    NULL,           /* class_data */
++    sizeof (GtkIMContextQuartz),
++    0,
++    (GInstanceInitFunc) gtk_im_context_quartz_init,
++  };
++
++  type_quartz =
++    g_type_module_register_type (module,
++                                 GTK_TYPE_IM_CONTEXT,
++                                 "GtkIMContextQuartz",
++                                 &object_info, 0);
++}
++
++MODULE_ENTRY (void, init) (GTypeModule * module)
++{
++  gtk_im_context_quartz_register_type (module);
++}
++
++MODULE_ENTRY (void, exit) (void)
++{
++}
++
++MODULE_ENTRY (void, list) (const GtkIMContextInfo *** contexts, int *n_contexts)
++{
++  *contexts = info_list;
++  *n_contexts = G_N_ELEMENTS (info_list);
++}
++
++MODULE_ENTRY (GtkIMContext *, create) (const gchar * context_id)
++{
++  g_return_val_if_fail (context_id, NULL);
++
++  if (!strcmp (context_id, "quartz"))
++    {
++      GTK_NOTE (MISC, g_print ("immodule_quartz create\n"));
++      return g_object_new (type_quartz, NULL);
++    }
++  else
++    return NULL;
++}

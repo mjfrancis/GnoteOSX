@@ -71,6 +71,9 @@ if [ ! -d Gnote.app ]; then
     echo "Installing gdk-pixbuf loader cache"
     gdk-pixbuf-query-loaders | sed -e 's|.*\(/gdk-pixbuf-2.0/[^/]*/loaders/[^/]*\)$|"@executable_path/../Resources/lib\1|g' > Gnote.app/Contents/Resources/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache
 
+    echo "Installing input method cache"
+    gtk-query-immodules-3.0 | sed -e 's|.*\(/lib/gtk-.*/immodules/.*\)|"@executable_path/../Resources\1|g' -e 's|"[^"]*locale"|"@executable_path/../Resources/share/locale"|g' > Gnote.app/Contents/Resources/lib/gtk-3.0/3.0.0/immodules.cache
+
     echo "Installing help files"
     install_help_files
 
