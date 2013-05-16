@@ -305,6 +305,10 @@ namespace gnote {
       .connect(boost::bind(sigc::mem_fun(*this, &Gnote::on_new_note_app_action), Glib::VariantBase()));
     am["ShowSearchAllNotesAction"]->signal_activate()
       .connect(sigc::mem_fun(*this, &Gnote::open_search_all));
+#ifdef PLATFORM_OSX
+    add_accelerator("<Primary>comma", "app.show-preferences", NULL);
+    add_accelerator("<Primary>q", "app.quit", NULL);
+#endif
   }
 
   void Gnote::on_quit_gnote_action(const Glib::VariantBase&)
