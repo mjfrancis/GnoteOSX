@@ -40,6 +40,9 @@ function install_help_files_for_language {
     pushd "$PWD" > /dev/null
     cd "$target"
     yelp-build html "$current/../help/$1"
+    # Fill in missing images from English
+    mkdir -p figures
+    cp -n $current/../help/C/figures/*.png figures/
     popd > /dev/null
     cp ../data/icons/hicolor_apps_16x16_gnote.png "Gnote.app/Contents/Resources/$2.lproj/Gnote.help/"
     sed -e 's/^<head>$/<head><meta name="AppleTitle" Content="Gnote Help"><meta name="AppleIcon" content="hicolor_apps_16x16_gnote.png">/g' -i "" "Gnote.app/Contents/Resources/$2.lproj/Gnote.help/index.html"
