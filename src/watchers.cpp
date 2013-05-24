@@ -19,7 +19,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -1093,8 +1092,13 @@ namespace gnote {
     switch (ev->keyval) {
     case GDK_KEY_Shift_L:
     case GDK_KEY_Shift_R:
+#ifdef PLATFORM_OSX
+    case GDK_KEY_Meta_L:
+    case GDK_KEY_Meta_R:
+#else
     case GDK_KEY_Control_L:
     case GDK_KEY_Control_R:
+#endif
     {
       // Control or Shift when hovering over a link
       // swiches to a bar cursor...
@@ -1195,7 +1199,7 @@ namespace gnote {
 
     // Don't show hand if Shift or Control is pressed
     bool avoid_hand = (pointer_mask & (Gdk::SHIFT_MASK |
-                                       Gdk::CONTROL_MASK)) != 0;
+                                       PLATFORM_ACCELERATOR_MASK)) != 0;
 
     if (hovering != m_hovering_on_link) {
       m_hovering_on_link = hovering;

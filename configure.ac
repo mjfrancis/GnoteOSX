@@ -72,6 +72,9 @@ if test "$os_osx" = "yes"; then
         AC_SUBST(GTK_MAC_LIBS)
         AC_SUBST(GTK_MAC_CFLAGS)
         AC_DEFINE([PLATFORM_OSX],[1],[Defined if platform is Mac OSX])
+	AC_DEFINE([PLATFORM_ACCELERATOR_MASK],[Gdk::META_MASK],[Platform accelerator mask])
+else
+	AC_DEFINE([PLATFORM_ACCELERATOR_MASK],[Gdk::CONTROL_MASK],[Platform accelerator mask])
 fi
 AM_CONDITIONAL(OS_OSX, test "$os_osx" = "yes")
 

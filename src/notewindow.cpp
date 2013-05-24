@@ -220,10 +220,10 @@ namespace gnote {
       m_text_menu->set_accel_group(m_accel_group);
       m_find_item->add_accelerator("activate", m_accel_group,
                                    GDK_KEY_F,
-                                   Gdk::CONTROL_MASK,
+                                   PLATFORM_ACCELERATOR_MASK,
                                    Gtk::ACCEL_VISIBLE);
       m_link_button->add_accelerator("clicked", m_accel_group,
-                                     GDK_KEY_L, Gdk::CONTROL_MASK,
+                                     GDK_KEY_L, PLATFORM_ACCELERATOR_MASK,
                                      Gtk::ACCEL_VISIBLE);
 
       if(!m_global_keys) {
@@ -236,12 +236,12 @@ namespace gnote {
         // Find Next (Ctrl-G)
         m_global_keys->add_accelerator(sigc::mem_fun(*this, &NoteWindow::find_next_activate),
                                        GDK_KEY_G,
-                                       Gdk::CONTROL_MASK,
+                                       PLATFORM_ACCELERATOR_MASK,
                                        Gtk::ACCEL_VISIBLE);
 
         // Find Previous (Ctrl-Shift-G)
         m_global_keys->add_accelerator(sigc::mem_fun(*this, &NoteWindow::find_previous_activate),
-                                       GDK_KEY_G, (Gdk::CONTROL_MASK | Gdk::SHIFT_MASK),
+                                       GDK_KEY_G, (PLATFORM_ACCELERATOR_MASK | Gdk::SHIFT_MASK),
                                        Gtk::ACCEL_VISIBLE);
 
         // Open Help (F1)
@@ -328,7 +328,7 @@ namespace gnote {
     link->set_sensitive(!m_note.get_buffer()->get_selection().empty());
     link->signal_activate().connect(sigc::mem_fun(*this, &NoteWindow::link_button_clicked));
     link->add_accelerator("activate", m_accel_group, GDK_KEY_L,
-                          Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+                          PLATFORM_ACCELERATOR_MASK, Gtk::ACCEL_VISIBLE);
     link->show();
       
     Gtk::ImageMenuItem *text_item = manage(new Gtk::ImageMenuItem(_("Te_xt"), true));
@@ -552,7 +552,7 @@ namespace gnote {
     find->set_image(*manage(new Gtk::Image (Gtk::Stock::FIND, Gtk::ICON_SIZE_MENU)));
     find->signal_activate().connect(sigc::mem_fun(*this, &NoteWindow::find_button_clicked));
     find->add_accelerator("activate", m_accel_group,
-                          GDK_KEY_F, Gdk::CONTROL_MASK,
+                          GDK_KEY_F, PLATFORM_ACCELERATOR_MASK,
                           Gtk::ACCEL_VISIBLE);
     find->show();
 
@@ -562,7 +562,7 @@ namespace gnote {
 
     find_next->signal_activate().connect(sigc::mem_fun(*this, &NoteWindow::find_next_activate));
     find_next->add_accelerator("activate", m_accel_group,
-                              GDK_KEY_G, Gdk::CONTROL_MASK,
+                              GDK_KEY_G, PLATFORM_ACCELERATOR_MASK,
                               Gtk::ACCEL_VISIBLE);
     find_next->show();
 
@@ -572,7 +572,7 @@ namespace gnote {
 
     find_previous->signal_activate().connect(sigc::mem_fun(*this, &NoteWindow::find_previous_activate));
     find_previous->add_accelerator("activate", m_accel_group,
-                                  GDK_KEY_G, (Gdk::CONTROL_MASK | Gdk::SHIFT_MASK),
+                                  GDK_KEY_G, (PLATFORM_ACCELERATOR_MASK | Gdk::SHIFT_MASK),
                                   Gtk::ACCEL_VISIBLE);
     find_previous->show();
 
@@ -1268,43 +1268,43 @@ namespace gnote {
   {
     m_undo->add_accelerator("activate", accel_group,
                             GDK_KEY_Z,
-                            Gdk::CONTROL_MASK,
+                            PLATFORM_ACCELERATOR_MASK,
                             Gtk::ACCEL_VISIBLE);
     m_redo->add_accelerator("activate", accel_group,
                             GDK_KEY_Z,
-                            Gdk::CONTROL_MASK | Gdk::SHIFT_MASK,
+                            PLATFORM_ACCELERATOR_MASK | Gdk::SHIFT_MASK,
                             Gtk::ACCEL_VISIBLE);
     m_bold.add_accelerator("activate", accel_group,
                            GDK_KEY_B,
-                           Gdk::CONTROL_MASK,
+                           PLATFORM_ACCELERATOR_MASK,
                            Gtk::ACCEL_VISIBLE);
     m_italic.add_accelerator("activate", accel_group,
                              GDK_KEY_I,
-                             Gdk::CONTROL_MASK,
+                             PLATFORM_ACCELERATOR_MASK,
                              Gtk::ACCEL_VISIBLE);
     m_strikeout.add_accelerator("activate", accel_group,
                                 GDK_KEY_S,
-                                Gdk::CONTROL_MASK,
+                                PLATFORM_ACCELERATOR_MASK,
                                 Gtk::ACCEL_VISIBLE);
     m_highlight.add_accelerator("activate", accel_group,
                                 GDK_KEY_H,
-                                Gdk::CONTROL_MASK,
+                                PLATFORM_ACCELERATOR_MASK,
                                 Gtk::ACCEL_VISIBLE);
     m_increase_font.add_accelerator("activate", accel_group,
                                     GDK_KEY_plus,
-                                    Gdk::CONTROL_MASK,
+                                    PLATFORM_ACCELERATOR_MASK,
                                     Gtk::ACCEL_VISIBLE);
     m_decrease_font.add_accelerator("activate", accel_group,
                                     GDK_KEY_minus,
-                                    Gdk::CONTROL_MASK,
+                                    PLATFORM_ACCELERATOR_MASK,
                                     Gtk::ACCEL_VISIBLE);
     m_increase_indent.add_accelerator("activate", accel_group,
                                       GDK_KEY_Right,
-                                      Gdk::MOD1_MASK,
+                                      PLATFORM_ACCELERATOR_MASK,
                                       Gtk::ACCEL_VISIBLE);
     m_decrease_indent.add_accelerator("activate", accel_group,
                                       GDK_KEY_Left,
-                                      Gdk::MOD1_MASK,
+                                      PLATFORM_ACCELERATOR_MASK,
                                       Gtk::ACCEL_VISIBLE);
   }
 

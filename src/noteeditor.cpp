@@ -227,7 +227,7 @@ namespace gnote {
       case GDK_KEY_KP_Enter:
       case GDK_KEY_Return:
         // Allow opening notes with Ctrl + Enter
-        if (ev->state != Gdk::CONTROL_MASK) {
+        if (ev->state != PLATFORM_ACCELERATOR_MASK) {
           if (ev->state & Gdk::SHIFT_MASK) {
             ret_value = NoteBuffer::Ptr::cast_static(get_buffer())->add_new_line (true);
           } 

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <config.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -191,7 +191,7 @@ namespace gnote {
 
       /* Don't activate if Shift or Control is pressed */
       if ((button_ev->state & (Gdk::SHIFT_MASK |
-                               Gdk::CONTROL_MASK)) != 0)
+                               PLATFORM_ACCELERATOR_MASK)) != 0)
         return false;
 
       // Prevent activation when selecting links with the mouse
@@ -224,7 +224,7 @@ namespace gnote {
       GdkEventKey *key_ev = (GdkEventKey*)ev;
 
       // Control-Enter activates the link at point...
-      if ((key_ev->state & Gdk::CONTROL_MASK) == 0)
+      if ((key_ev->state & PLATFORM_ACCELERATOR_MASK) == 0)
         return false;
 
       if (key_ev->keyval != GDK_KEY_Return &&

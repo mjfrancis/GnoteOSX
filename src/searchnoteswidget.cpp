@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <config.h>
 
 #include <boost/format.hpp>
 #include <glibmm/i18n.h>
@@ -857,7 +858,7 @@ bool SearchNotesWidget::on_treeview_button_pressed(GdkEventButton *ev)
 
   switch(ev->type) {
   case GDK_2BUTTON_PRESS:
-    if(ev->button != 1 || (ev->state & (Gdk::CONTROL_MASK | Gdk::SHIFT_MASK)) != 0) {
+    if(ev->button != 1 || (ev->state & (PLATFORM_ACCELERATOR_MASK | Gdk::SHIFT_MASK)) != 0) {
       break;
     }
 
@@ -893,7 +894,7 @@ bool SearchNotesWidget::on_treeview_button_pressed(GdkEventButton *ev)
     }
 
     if(m_tree->get_selection()->is_selected(dest_path)
-       && (ev->state & (Gdk::CONTROL_MASK | Gdk::SHIFT_MASK)) == 0) {
+       && (ev->state & (PLATFORM_ACCELERATOR_MASK | Gdk::SHIFT_MASK)) == 0) {
       if(column && (ev->button == 1)) {
         Gtk::CellRenderer *renderer = column->get_first_cell();
         Gdk::Rectangle background_area;
@@ -952,7 +953,7 @@ bool SearchNotesWidget::on_treeview_motion_notify(GdkEventMotion *ev)
 bool SearchNotesWidget::on_treeview_button_released(GdkEventButton *ev)
 {
   if(!m_tree->drag_check_threshold(m_clickX, m_clickY, ev->x, ev->y)
-     && ((ev->state & (Gdk::CONTROL_MASK | Gdk::SHIFT_MASK)) == 0)
+     && ((ev->state & (PLATFORM_ACCELERATOR_MASK | Gdk::SHIFT_MASK)) == 0)
      && m_tree->get_selection()->count_selected_rows () > 1) {
     Gtk::TreePath dest_path;
     Gtk::TreeViewColumn * col = NULL; // unused
@@ -1309,7 +1310,7 @@ Gtk::Menu *SearchNotesWidget::get_note_list_context_menu()
 
     Gtk::MenuItem *item = manage(new Gtk::MenuItem);
     item->set_related_action(m_open_note_action);
-    item->add_accelerator("activate", m_accel_group, GDK_KEY_O, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    item->add_accelerator("activate", m_accel_group, GDK_KEY_O, PLATFORM_ACCELERATOR_MASK, Gtk::ACCEL_VISIBLE);
     m_note_list_context_menu->add(*item);
 
     item = manage(new Gtk::MenuItem);
