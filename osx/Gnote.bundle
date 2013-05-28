@@ -104,6 +104,7 @@
   <icon-theme icons="none">gnome</icon-theme>
   <data>${prefix}/share/icons/gnome/scalable/actions/edit-find-symbolic.svg</data>
   <data>${prefix}/share/icons/gnome/scalable/emblems/emblem-system-symbolic.svg</data>
+  <data>${prefix}/share/icons/gnome/scalable/actions/go-previous-symbolic.svg</data>
   <data>${prefix}/share/icons/gnome/22x22/emblems/emblem-package.png</data>
 
 
