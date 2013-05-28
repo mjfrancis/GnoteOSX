@@ -35,7 +35,6 @@
 #include <glibmm/i18n.h>
 #include <glibmm/stringutils.h>
 #include <glibmm/threads.h>
-#include <gtkmm/accelgroup.h>
 #include <gtkmm/icontheme.h>
 #include <gtkmm/image.h>
 #include <gtkmm/label.h>
