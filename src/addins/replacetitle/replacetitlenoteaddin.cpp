@@ -17,6 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+
 #include <glibmm/i18n.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/clipboard.h>
@@ -64,14 +69,14 @@ void ReplaceTitleNoteAddin::on_note_foregrounded()
   m_menu_item->add_accelerator("activate",
                                get_window()->get_accel_group(),
                                GDK_KEY_R,
-                               Gdk::CONTROL_MASK,
+                               PLATFORM_ACCELERATOR_MASK,
                                 Gtk::ACCEL_VISIBLE);
 }
 
 void ReplaceTitleNoteAddin::on_note_backgrounded()
 {
   m_menu_item->remove_accelerator(get_window()->get_accel_group(),
-                                  GDK_KEY_R, Gdk::CONTROL_MASK);
+                                  GDK_KEY_R, PLATFORM_ACCELERATOR_MASK);
 }
 
 void ReplaceTitleNoteAddin::replacetitle_button_clicked()

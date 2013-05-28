@@ -20,6 +20,11 @@
 
 /* A subclass of NoteAddin, implementing the Table of Content add-in */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+
 #include <glibmm/i18n.h>
 
 #include <gtkmm/stock.h>
@@ -64,8 +69,8 @@ Gtk::ImageMenuItem * new_toc_menu_item ()
   Gtk::AccelLabel *acclabel = manage(new Gtk::AccelLabel(_("Table of Contents")));
   acclabel->set_alignment (Gtk::ALIGN_START);
   /* I don't have gtkmm-3.6, but I have gtk-3.6 */
-  /* TO UNCOMMENT *///acclabel->set_accel (GDK_KEY_1, Gdk::CONTROL_MASK | Gdk::MOD1_MASK);
-  /* TO DELETE    */gtk_accel_label_set_accel (acclabel->gobj (),GDK_KEY_1, GdkModifierType (GDK_CONTROL_MASK | GDK_MOD1_MASK));
+  /* TO UNCOMMENT *///acclabel->set_accel (GDK_KEY_1, PLATFORM_ACCELERATOR_MASK | Gdk::MOD1_MASK);
+  /* TO DELETE    */gtk_accel_label_set_accel (acclabel->gobj (),GDK_KEY_1, GdkModifierType (PLATFORM_ACCELERATOR_MASK | GDK_MOD1_MASK));
   acclabel->show ();
 
   menu_item->add (*acclabel);
@@ -161,13 +166,13 @@ void TableofcontentNoteAddin::populate_toc_menu (Gtk::Menu *toc_menu, bool has_a
     }
 
     item = manage(new Gtk::MenuItem (_("Header Level 1")));
-    item->add_accelerator("activate", get_note()->get_window()->get_accel_group(), GDK_KEY_1, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    item->add_accelerator("activate", get_note()->get_window()->get_accel_group(), GDK_KEY_1, PLATFORM_ACCELERATOR_MASK, Gtk::ACCEL_VISIBLE);
     item->signal_activate().connect(sigc::mem_fun(*this, &TableofcontentNoteAddin::on_level_1_activated));
     item->show ();
     toc_menu->append(*item);
 
     item = manage(new Gtk::MenuItem (_("Header Level 2")));
-    item->add_accelerator("activate", get_note()->get_window()->get_accel_group(), GDK_KEY_2, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    item->add_accelerator("activate", get_note()->get_window()->get_accel_group(), GDK_KEY_2, PLATFORM_ACCELERATOR_MASK, Gtk::ACCEL_VISIBLE);
     item->signal_activate().connect(sigc::mem_fun(*this, &TableofcontentNoteAddin::on_level_2_activated));
     item->show ();
     toc_menu->append(*item);
@@ -305,11 +310,11 @@ bool TableofcontentNoteAddin::on_key_pressed(GdkEventKey *ev)
   switch(ev->keyval) {
 
   case GDK_KEY_1:
-      if (ev->state == (GDK_CONTROL_MASK | GDK_MOD1_MASK)) {// Ctrl-Alt-1
+      if (ev->state == (PLATFORM_ACCELERATOR_MASK | GDK_MOD1_MASK)) {// Ctrl-Alt-1
         on_toc_popup_activated();
         return true;
       }
-      else if (ev->state == GDK_CONTROL_MASK) { // Ctrl-1
+      else if (ev->state == PLATFORM_ACCELERATOR_MASK) { // Ctrl-1
         on_level_1_activated ();
         return true;
       }
@@ -319,7 +324,7 @@ bool TableofcontentNoteAddin::on_key_pressed(GdkEventKey *ev)
   break;
 
   case GDK_KEY_2:
-      if (ev->state == GDK_CONTROL_MASK) { // Ctrl-2
+      if (ev->state == PLATFORM_ACCELERATOR_MASK) { // Ctrl-2
         on_level_2_activated ();
         return true;
       }

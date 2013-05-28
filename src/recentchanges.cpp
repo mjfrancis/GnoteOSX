@@ -153,7 +153,7 @@ namespace gnote {
     m_new_note_button = manage(new Gtk::Button);
     m_new_note_button->set_vexpand(true);
     m_new_note_button->set_label(_("New"));
-    m_new_note_button->add_accelerator("activate", get_accel_group(), GDK_KEY_N, Gdk::CONTROL_MASK, (Gtk::AccelFlags) 0);
+    m_new_note_button->add_accelerator("activate", get_accel_group(), GDK_KEY_N, PLATFORM_ACCELERATOR_MASK, (Gtk::AccelFlags) 0);
     m_new_note_button->signal_clicked().connect(sigc::mem_fun(m_search_notes_widget, &SearchNotesWidget::new_note));
     m_new_note_button->show_all();
     left_box->attach(*m_new_note_button, 1, 0, 1, 1);
@@ -172,7 +172,7 @@ namespace gnote {
     image->property_margin() = icon_margin;
     m_search_button.set_image(*image);
     m_search_button.signal_toggled().connect(sigc::mem_fun(*this, &NoteRecentChanges::on_search_button_toggled));
-    m_search_button.add_accelerator("activate", get_accel_group(), GDK_KEY_F, Gdk::CONTROL_MASK, (Gtk::AccelFlags) 0);
+    m_search_button.add_accelerator("activate", get_accel_group(), GDK_KEY_F, PLATFORM_ACCELERATOR_MASK, (Gtk::AccelFlags) 0);
     m_search_button.set_tooltip_text(_("Search"));
     m_search_button.show_all();
     right_box->attach(m_search_button, 0, 0, 1, 1);
@@ -669,7 +669,7 @@ namespace gnote {
       menu->append(*manage(new Gtk::SeparatorMenuItem));
     }
     Gtk::MenuItem *item = manage(new Gtk::MenuItem(_("_Close"), true));
-    item->add_accelerator("activate", get_accel_group(), GDK_KEY_W, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
+    item->add_accelerator("activate", get_accel_group(), GDK_KEY_W, PLATFORM_ACCELERATOR_MASK, Gtk::ACCEL_VISIBLE);
     item->signal_activate().connect(sigc::mem_fun(*this, &NoteRecentChanges::on_close_window));
     menu->append(*item);
     menu->property_attach_widget() = button;

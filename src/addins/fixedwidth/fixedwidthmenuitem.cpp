@@ -18,6 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 
 #include <glibmm/i18n.h>
@@ -71,7 +74,7 @@ namespace fixedwidth {
     add_accelerator("activate",
                     m_note_addin->get_window()->get_accel_group(),
                     GDK_KEY_T,
-                    Gdk::CONTROL_MASK,
+                    PLATFORM_ACCELERATOR_MASK,
                     Gtk::ACCEL_VISIBLE);
   }
 
@@ -80,7 +83,7 @@ namespace fixedwidth {
   {
     remove_accelerator(m_note_addin->get_window()->get_accel_group(),
                        GDK_KEY_T,
-                       Gdk::CONTROL_MASK);
+                       PLATFORM_ACCELERATOR_MASK);
   }
 
 

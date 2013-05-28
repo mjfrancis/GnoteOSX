@@ -18,6 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+
 #include <string.h>
 
 #include <glibmm/i18n.h>
@@ -55,7 +60,7 @@ namespace inserttimestamp {
     m_item->signal_activate().connect(
       sigc::mem_fun(*this, &InsertTimestampNoteAddin::on_menu_item_activated));
     m_item->add_accelerator ("activate", get_window()->get_accel_group(),
-                             GDK_KEY_d, Gdk::CONTROL_MASK,
+                             GDK_KEY_d, PLATFORM_ACCELERATOR_MASK,
                              Gtk::ACCEL_VISIBLE);
     m_item->show ();
     add_plugin_menu_item (m_item);

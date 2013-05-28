@@ -18,6 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 
 #include <boost/format.hpp>
@@ -72,7 +75,7 @@ namespace printnotes {
   void PrintNotesNoteAddin::on_note_foregrounded()
   {
     m_item->add_accelerator("activate", get_window()->get_accel_group(),
-                            GDK_KEY_P, Gdk::CONTROL_MASK,
+                            GDK_KEY_P, PLATFORM_ACCELERATOR_MASK,
                             Gtk::ACCEL_VISIBLE);
   }
 
@@ -80,7 +83,7 @@ namespace printnotes {
   void PrintNotesNoteAddin::on_note_backgrounded()
   {
     m_item->remove_accelerator(get_window()->get_accel_group(),
-                               GDK_KEY_P, Gdk::CONTROL_MASK);
+                               GDK_KEY_P, PLATFORM_ACCELERATOR_MASK);
   }
 
 
