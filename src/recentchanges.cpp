@@ -88,7 +88,7 @@ namespace gnote {
     IGnote::obj().signal_quit
       .connect(sigc::mem_fun(*this, &NoteRecentChanges::on_close_window));// to save size/pos
     m_keybinder.add_accelerator(sigc::mem_fun(*this, &NoteRecentChanges::on_close_window),
-                                GDK_KEY_W, Gdk::CONTROL_MASK, (Gtk::AccelFlags)0);
+                                GDK_KEY_W, PLATFORM_ACCELERATOR_MASK, (Gtk::AccelFlags)0);
 
     embed_widget(m_search_notes_widget);
 
