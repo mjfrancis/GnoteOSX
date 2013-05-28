@@ -28,6 +28,7 @@
 #include <gdkmm/pixbuf.h>
 #include <gtkmm/applicationwindow.h>
 #include <gtkmm/dialog.h>
+#include <gtkmm/grid.h>
 #include <gtkmm/image.h>
 #include <gtkmm/menu.h>
 #include <gtkmm/messagedialog.h>
@@ -103,7 +104,7 @@ namespace gnote {
       void set_extra_widget(Gtk::Widget *);
     private:
       Glib::RefPtr<Gtk::AccelGroup> m_accel_group;
-      Gtk::VBox *m_extra_widget_vbox;
+      Gtk::Grid *m_extra_widget_vbox;
       Gtk::Widget *m_extra_widget;
       Gtk::Image *m_image;
 
@@ -230,6 +231,7 @@ namespace gnote {
       : public Gtk::ToggleToolButton
     {
     public:
+      ToolMenuButton(Gtk::Widget & widget, Gtk::Menu *menu);
       ToolMenuButton(Gtk::Toolbar& toolbar, 
                      const Gtk::BuiltinStockID& stock_image, 
                      const Glib::ustring & label, Gtk::Menu * menu);
@@ -240,64 +242,12 @@ namespace gnote {
       virtual bool on_mnemonic_activate(bool group_cycling);
 
     private:
+      void _common_init();
       void _common_init(Gtk::Image& image, const Glib::ustring & l);
       // managed by gtkmm
       Gtk::Menu *m_menu;
       void release_button();        
     };
-
-    class EmbeddableWidget;
-    class EmbeddableWidgetHost
-    {
-    public:
-      virtual void embed_widget(EmbeddableWidget &) = 0;
-      virtual void unembed_widget(EmbeddableWidget &) = 0;
-      virtual void foreground_embedded(EmbeddableWidget &) = 0;
-      virtual void background_embedded(EmbeddableWidget &) = 0;
-      virtual bool running() = 0;
-    };
-
-    class EmbeddableWidget
-    {
-    public:
-      EmbeddableWidget() : m_host(NULL) {}
-      virtual std::string get_name() const = 0;
-      virtual void embed(EmbeddableWidgetHost *h)
-        {
-          //remove from previous host, if any
-          if(m_host) {
-            m_host->unembed_widget(*this);
-          }
-          m_host = h;
-          signal_embedded();
-        }
-      virtual void unembed()
-        {
-          m_host = NULL;
-          signal_unembedded();
-        }
-      virtual void foreground()
-        {
-          signal_foregrounded();
-        }
-      virtual void background()
-        {
-          signal_backgrounded();
-        }
-      EmbeddableWidgetHost *host() const
-        {
-          return m_host;
-        }
-
-      sigc::signal<void, const std::string &> signal_name_changed;
-      sigc::signal<void> signal_embedded;
-      sigc::signal<void> signal_unembedded;
-      sigc::signal<void> signal_foregrounded;
-      sigc::signal<void> signal_backgrounded;
-    private:
-      EmbeddableWidgetHost *m_host;
-    };
-
 
   }
 }

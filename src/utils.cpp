@@ -347,9 +347,11 @@ namespace gnote {
       m_accel_group = Glib::RefPtr<Gtk::AccelGroup>(Gtk::AccelGroup::create());
       add_accel_group(m_accel_group);
 
-      Gtk::HBox *hbox = manage(new Gtk::HBox (false, 12));
+      Gtk::Grid *hbox = manage(new Gtk::Grid);
+      hbox->set_column_spacing(12);
       hbox->set_border_width(5);
       hbox->show();
+      int hbox_col = 0;
       get_vbox()->pack_start(*hbox, false, false, 0);
 
       switch (msg_type) {
@@ -378,12 +380,14 @@ namespace gnote {
         Gtk::manage(m_image);
         m_image->show();
         m_image->property_yalign().set_value(0);
-        hbox->pack_start(*m_image, false, false, 0);
+        hbox->attach(*m_image, hbox_col++, 0, 1, 1);
       }
 
-      Gtk::VBox *label_vbox = manage(new Gtk::VBox (false, 0));
+      Gtk::Grid *label_vbox = manage(new Gtk::Grid);
       label_vbox->show();
-      hbox->pack_start(*label_vbox, true, true, 0);
+      int label_vbox_row = 0;
+      label_vbox->set_hexpand(true);
+      hbox->attach(*label_vbox, hbox_col++, 0, 1, 1);
 
       std::string title = str(boost::format("<span weight='bold' size='larger'>%1%"
                                             "</span>\n") % header.c_str());
@@ -396,7 +400,7 @@ namespace gnote {
       label->set_line_wrap(true);
       label->set_alignment (0.0f, 0.5f);
       label->show();
-      label_vbox->pack_start(*label, false, false, 0);
+      label_vbox->attach(*label, 0, label_vbox_row++, 1, 1);
 
       label = manage(new Gtk::Label(msg));
       label->set_use_markup(true);
@@ -404,11 +408,12 @@ namespace gnote {
       label->set_line_wrap(true);
       label->set_alignment (0.0f, 0.5f);
       label->show();
-      label_vbox->pack_start(*label, false, false, 0);
+      label_vbox->attach(*label, 0, label_vbox_row++, 1, 1);
       
-      m_extra_widget_vbox = manage(new Gtk::VBox (false, 0));
+      m_extra_widget_vbox = manage(new Gtk::Grid);
       m_extra_widget_vbox->show();
-      label_vbox->pack_start(*m_extra_widget_vbox, true, true, 12);
+      m_extra_widget_vbox->set_margin_left(12);
+      label_vbox->attach(*m_extra_widget_vbox, 0, label_vbox_row++, 1, 1);
 
       switch (btn_type) {
       case Gtk::BUTTONS_NONE:
@@ -496,7 +501,7 @@ namespace gnote {
         
       m_extra_widget = value;
       m_extra_widget->show_all ();
-      m_extra_widget_vbox->pack_start (*m_extra_widget, true, true, 0);
+      m_extra_widget_vbox->attach(*m_extra_widget, 0, 0, 1, 1);
     }
 
 
@@ -770,6 +775,13 @@ namespace gnote {
       return false;
     }
 
+    ToolMenuButton::ToolMenuButton(Gtk::Widget & widget, Gtk::Menu *menu)
+      : Gtk::ToggleToolButton(widget)
+      ,  m_menu(menu)
+    {
+      _common_init();
+    }
+
     ToolMenuButton::ToolMenuButton(Gtk::Toolbar& toolbar, const Gtk::BuiltinStockID& stock_image, 
                                    const Glib::ustring & label, 
                                    Gtk::Menu * menu)
@@ -790,16 +802,21 @@ namespace gnote {
     }
 
 
+    void ToolMenuButton::_common_init()
+    {
+      property_can_focus() = true;
+      gtk_menu_attach_to_widget(m_menu->gobj(), static_cast<Gtk::Widget*>(this)->gobj(),
+                                NULL);
+      m_menu->signal_deactivate().connect(sigc::mem_fun(*this, &ToolMenuButton::release_button));
+      show_all();
+    }
+
+
     void ToolMenuButton::_common_init(Gtk::Image& image, const Glib::ustring & label)
     {
       set_icon_widget(image);
       set_label_widget(*manage(new Gtk::Label(label, true)));
-      property_can_focus() = true;
-      gtk_menu_attach_to_widget(m_menu->gobj(), static_cast<Gtk::Widget*>(this)->gobj(),
-                                NULL);
-//      menu.attach_to_widget(*this);
-      m_menu->signal_deactivate().connect(sigc::mem_fun(*this, &ToolMenuButton::release_button));
-      show_all();
+      _common_init();
     }
 
 
@@ -835,8 +852,6 @@ namespace gnote {
     {
       set_active(false);
     }
-    
-    
 
   }
 }

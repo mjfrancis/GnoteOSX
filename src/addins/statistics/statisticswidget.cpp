@@ -150,6 +150,8 @@ private:
 StatisticsWidget::StatisticsWidget(gnote::NoteManager & nm)
   : Gtk::TreeView(StatisticsModel::create(nm))
 {
+  set_hexpand(true);
+  set_vexpand(true);
   StatisticsModel::Ptr model = StatisticsModel::Ptr::cast_dynamic(get_model());
   set_model(model);
   set_headers_visible(false);
@@ -172,7 +174,7 @@ std::string StatisticsWidget::get_name() const
 
 void StatisticsWidget::foreground()
 {
-  gnote::utils::EmbeddableWidget::foreground();
+  gnote::EmbeddableWidget::foreground();
   StatisticsModel::Ptr model = StatisticsModel::Ptr::cast_static(get_model());
   model->active(true);
   model->update();
@@ -181,7 +183,7 @@ void StatisticsWidget::foreground()
 
 void StatisticsWidget::background()
 {
-  gnote::utils::EmbeddableWidget::background();
+  gnote::EmbeddableWidget::background();
   StatisticsModel::Ptr::cast_static(get_model())->active(false);
 }
 

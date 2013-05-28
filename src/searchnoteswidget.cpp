@@ -28,7 +28,6 @@
 #include <gtkmm/liststore.h>
 #include <gtkmm/separatormenuitem.h>
 #include <gtkmm/stock.h>
-#include <gtkmm/table.h>
 
 #include "debug.hpp"
 #include "iconmanager.hpp"
@@ -52,8 +51,7 @@ Glib::RefPtr<Gdk::Pixbuf> SearchNotesWidget::get_note_icon()
 
 
 SearchNotesWidget::SearchNotesWidget(NoteManager & m)
-  : Gtk::VBox(false, 0)
-  , m_accel_group(Gtk::AccelGroup::create())
+  : m_accel_group(Gtk::AccelGroup::create())
   , m_no_matches_box(NULL)
   , m_manager(m)
   , m_clickX(0), m_clickY(0)
@@ -62,16 +60,17 @@ SearchNotesWidget::SearchNotesWidget(NoteManager & m)
   , m_notebook_list_context_menu(NULL)
   , m_initial_position_restored(false)
 {
+  set_hexpand(true);
+  set_vexpand(true);
   make_actions();
 
   // Notebooks Pane
   Gtk::Widget *notebooksPane = Gtk::manage(make_notebooks_pane());
   notebooksPane->show();
 
-  m_hpaned.set_position(150);
-  m_hpaned.add1(*notebooksPane);
-  m_hpaned.add2(m_matches_window);
-  m_hpaned.show();
+  set_position(150);
+  add1(*notebooksPane);
+  add2(m_matches_window);
 
   make_recent_tree();
   m_tree = manage(m_tree);
@@ -85,10 +84,6 @@ SearchNotesWidget::SearchNotesWidget(NoteManager & m)
   m_matches_window.property_vscrollbar_policy() = Gtk::POLICY_AUTOMATIC;
   m_matches_window.add(*m_tree);
   m_matches_window.show();
-
-  restore_position();
-
-  pack_start(m_hpaned, true, true, 0);
 
   // Update on changes to notes
   m.signal_note_deleted.connect(sigc::mem_fun(*this, &SearchNotesWidget::on_note_deleted));
@@ -190,16 +185,17 @@ void SearchNotesWidget::perform_search()
 
     add_matches_column();
     m_store_filter->refilter();
-    m_tree->scroll_to_point(0, 0);
+    if(m_tree->get_realized()) {
+      m_tree->scroll_to_point(0, 0);
+    }
   }
 }
 
 void SearchNotesWidget::restore_matches_window()
 {
-  if(m_no_matches_box && m_hpaned.get_child2() == m_no_matches_box) {
-    m_hpaned.remove(*m_no_matches_box);
-    m_hpaned.add2(m_matches_window);
-    restore_position();
+  if(m_no_matches_box && get_child2() == m_no_matches_box) {
+    remove(*m_no_matches_box);
+    add2(m_matches_window);
   }
 }
 
@@ -255,44 +251,6 @@ Gtk::Widget *SearchNotesWidget::make_notebooks_pane()
   return sw;
 }
 
-void SearchNotesWidget::restore_position()
-{
-  Glib::RefPtr<Gio::Settings> settings = Preferences::obj()
-    .get_schema_settings(Preferences::SCHEMA_GNOTE);
-  int x = settings->get_int(Preferences::SEARCH_WINDOW_X_POS);
-  int y = settings->get_int(Preferences::SEARCH_WINDOW_Y_POS);
-  int width = settings->get_int(Preferences::SEARCH_WINDOW_WIDTH);
-  int height = settings->get_int(Preferences::SEARCH_WINDOW_HEIGHT);
-  int pos = settings->get_int(Preferences::SEARCH_WINDOW_SPLITTER_POS);
-  bool maximized = settings->get_boolean(Preferences::MAIN_WINDOW_MAXIMIZED);
-
-  if((width == 0) || (height == 0)) {
-    return;
-  }
-  Gtk::Window *window = get_owning_window();
-  if(!window) {
-    return;
-  }
-
-  if(window->get_realized()) {
-    //if window is showing, use actual state
-    maximized = window->get_window()->get_state() & Gdk::WINDOW_STATE_MAXIMIZED;
-  }
-
-  window->set_default_size(width, height);
-  if(!m_initial_position_restored) {
-    window->move(x, y);
-    m_initial_position_restored = true;
-  }
-
-  if(!maximized && window->get_visible()) {
-    window->get_window()->resize(width, height);
-  }
-  if(pos) {
-    m_hpaned.set_position(pos);
-  }
-}
-
 void SearchNotesWidget::save_position()
 {
   int x;
@@ -300,14 +258,14 @@ void SearchNotesWidget::save_position()
   int width;
   int height;
 
-  utils::EmbeddableWidgetHost *current_host = host();
+  EmbeddableWidgetHost *current_host = host();
   if(!current_host || !current_host->running()) {
     return;
   }
 
   Glib::RefPtr<Gio::Settings> settings = Preferences::obj()
     .get_schema_settings(Preferences::SCHEMA_GNOTE);
-  settings->set_int(Preferences::SEARCH_WINDOW_SPLITTER_POS, m_hpaned.get_position());
+  settings->set_int(Preferences::SEARCH_WINDOW_SPLITTER_POS, get_position());
 
   Gtk::Window *window = dynamic_cast<Gtk::Window*>(current_host);
   if(!window || (window->get_window()->get_state() & Gdk::WINDOW_STATE_MAXIMIZED) != 0) {
@@ -500,9 +458,13 @@ void SearchNotesWidget::select_all_notes_notebook()
   if(!model) {
     return;
   }
-  Gtk::TreeIter iter = model->children().begin();
-  if(iter) {
-    m_notebooksTree->get_selection()->select(iter);
+  for(Gtk::TreeIter iter = model->children().begin(); iter; ++iter) {
+    notebooks::Notebook::Ptr notebook;
+    iter->get_value(0, notebook);
+    if(std::tr1::dynamic_pointer_cast<notebooks::AllNotesNotebook>(notebook) != NULL) {
+      m_notebooksTree->get_selection()->select(iter);
+      break;
+    }
   }
 }
 
@@ -623,14 +585,14 @@ bool SearchNotesWidget::filter_notes(const Gtk::TreeIter & iter)
 
 int SearchNotesWidget::compare_titles(const Gtk::TreeIter & a, const Gtk::TreeIter & b)
 {
-  std::string title_a = (*a)[m_column_types.title];
-  std::string title_b = (*b)[m_column_types.title];
+  Glib::ustring title_a = std::string((*a)[m_column_types.title]);
+  Glib::ustring title_b = std::string((*b)[m_column_types.title]);
 
   if(title_a.empty() || title_b.empty()) {
     return -1;
   }
 
-  return title_a.compare(title_b);
+  return title_a.lowercase().compare(title_b.lowercase());
 }
 
 int SearchNotesWidget::compare_dates(const Gtk::TreeIter & a, const Gtk::TreeIter & b)
@@ -831,10 +793,12 @@ void SearchNotesWidget::on_selection_changed()
 
   if(selected_notes.empty()) {
     m_open_note_action->property_sensitive() = false;
+    m_open_note_new_window_action->property_sensitive() = false;
     m_delete_note_action->property_sensitive() = false;
   }
   else {
     m_open_note_action->property_sensitive() = true;
+    m_open_note_new_window_action->property_sensitive() = true;
     m_delete_note_action->property_sensitive() = true;
   }
 }
@@ -1034,7 +998,7 @@ void SearchNotesWidget::remove_matches_column()
 // called when no search results are found in the selected notebook
 void SearchNotesWidget::no_matches_found_action()
 {
-  m_hpaned.remove(m_matches_window);
+  remove(m_matches_window);
   if(!m_no_matches_box) {
     Glib::ustring message = _("No results found in the selected notebook.\nClick here to search across all notes.");
     Gtk::LinkButton *link_button = manage(new Gtk::LinkButton("", message));
@@ -1042,20 +1006,17 @@ void SearchNotesWidget::no_matches_found_action()
       .connect(sigc::mem_fun(*this, &SearchNotesWidget::show_all_search_results));
     link_button->set_tooltip_text(_("Click here to search across all notebooks"));
     link_button->show();
-    Gtk::Table *no_matches_found_table = manage(new Gtk::Table(1, 3, false));
-    no_matches_found_table->attach(*link_button, 1, 2, 0, 1,
-      Gtk::FILL | Gtk::SHRINK,
-      Gtk::SHRINK,
-      0, 0
-    );
+    Gtk::Alignment *no_matches_found = manage(new Gtk::Alignment(Gtk::ALIGN_CENTER, Gtk::ALIGN_CENTER, 0.0, 0.0));
+    no_matches_found->add(*link_button);
 
-    no_matches_found_table->set_col_spacings(4);
-    no_matches_found_table->show_all();
-    m_no_matches_box = manage(new Gtk::HBox(false, 0));
-    m_no_matches_box->pack_start(*no_matches_found_table, true, true, 0);
+    no_matches_found->set_hexpand(true);
+    no_matches_found->set_vexpand(true);
+    no_matches_found->show_all();
+    m_no_matches_box = manage(new Gtk::Grid);
+    m_no_matches_box->attach(*no_matches_found, 0, 0, 1, 1);
     m_no_matches_box->show();
   }
-  m_hpaned.add2(*m_no_matches_box);
+  add2(*m_no_matches_box);
 }
 
 void SearchNotesWidget::add_matches_column()
@@ -1089,8 +1050,7 @@ void SearchNotesWidget::add_matches_column()
 
 bool SearchNotesWidget::show_all_search_results()
 {
-  Gtk::TreeIter iter = m_notebooksTree->get_model()->children().begin();
-  m_notebooksTree->get_selection()->select(iter);
+  select_all_notes_notebook();
   return false;
 }
 
@@ -1324,6 +1284,7 @@ Gtk::Menu *SearchNotesWidget::get_note_list_context_menu()
 
     m_note_list_context_menu->add(*manage(new Gtk::SeparatorMenuItem));
     item = manage(new Gtk::MenuItem(_("_New Note"), true));
+    item->add_accelerator("activate", m_accel_group, GDK_KEY_N, Gdk::CONTROL_MASK, Gtk::ACCEL_VISIBLE);
     item->signal_activate().connect(sigc::mem_fun(*this, &SearchNotesWidget::new_note));
     m_note_list_context_menu->add(*item);
   }
@@ -1400,8 +1361,7 @@ void SearchNotesWidget::on_delete_notebook()
 
 void SearchNotesWidget::foreground()
 {
-  utils::EmbeddableWidget::foreground();
-  restore_position();
+  EmbeddableWidget::foreground();
   Gtk::Window *win = dynamic_cast<Gtk::Window*>(host());
   if(win) {
     win->add_accel_group(m_accel_group);
@@ -1410,11 +1370,37 @@ void SearchNotesWidget::foreground()
 
 void SearchNotesWidget::background()
 {
-  utils::EmbeddableWidget::background();
+  EmbeddableWidget::background();
   save_position();
   Gtk::Window *win = dynamic_cast<Gtk::Window*>(host());
   if(win) {
     win->remove_accel_group(m_accel_group);
+  }
+}
+
+void SearchNotesWidget::hint_position(int & x, int & y)
+{
+  Glib::RefPtr<Gio::Settings> settings = Preferences::obj()
+    .get_schema_settings(Preferences::SCHEMA_GNOTE);
+  x = settings->get_int(Preferences::SEARCH_WINDOW_X_POS);
+  y = settings->get_int(Preferences::SEARCH_WINDOW_Y_POS);
+}
+
+void SearchNotesWidget::hint_size(int & width, int & height)
+{
+  Glib::RefPtr<Gio::Settings> settings = Preferences::obj()
+    .get_schema_settings(Preferences::SCHEMA_GNOTE);
+  width = settings->get_int(Preferences::SEARCH_WINDOW_WIDTH);
+  height = settings->get_int(Preferences::SEARCH_WINDOW_HEIGHT);
+}
+
+void SearchNotesWidget::size_internals()
+{
+  Glib::RefPtr<Gio::Settings> settings = Preferences::obj()
+    .get_schema_settings(Preferences::SCHEMA_GNOTE);
+  int pos = settings->get_int(Preferences::SEARCH_WINDOW_SPLITTER_POS);
+  if(pos) {
+    set_position(pos);
   }
 }
 

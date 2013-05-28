@@ -25,13 +25,13 @@
 
 #include <set>
 
-#include <gtkmm/box.h>
+#include <gtkmm/grid.h>
 #include <gtkmm/liststore.h>
 #include <gtkmm/paned.h>
 #include <gtkmm/scrolledwindow.h>
 #include <sigc++/sigc++.h>
 
-#include "utils.hpp"
+#include "mainwindowembeds.hpp"
 #include "notebooks/notebook.hpp"
 #include "notebooks/notebookstreeview.hpp"
 
@@ -39,8 +39,9 @@
 namespace gnote {
 
 class SearchNotesWidget
-  : public Gtk::VBox
-  , public utils::EmbeddableWidget
+  : public Gtk::HPaned
+  , public EmbeddableWidget
+  , public SearchableItem
 {
 public:
   SearchNotesWidget(NoteManager & m);
@@ -48,8 +49,11 @@ public:
   virtual std::string get_name() const;
   virtual void foreground();
   virtual void background();
+  virtual void hint_position(int & x, int & y);
+  virtual void hint_size(int & width, int & height);
+  virtual void size_internals();
 
-  void perform_search(const std::string & search_text);
+  virtual void perform_search(const std::string & search_text);
   void select_all_notes_notebook();
   void new_note();
   void delete_selected_notes();
@@ -61,7 +65,6 @@ private:
   void perform_search();
   void restore_matches_window();
   Gtk::Widget *make_notebooks_pane();
-  void restore_position();
   void save_position();
   void notebook_pixbuf_cell_data_func(Gtk::CellRenderer *, const Gtk::TreeIter &);
   void notebook_text_cell_data_func(Gtk::CellRenderer *, const Gtk::TreeIter &);
@@ -147,9 +150,8 @@ private:
   Glib::RefPtr<Gtk::Action> m_delete_note_action;
   Glib::RefPtr<Gtk::Action> m_delete_notebook_action;
   RecentSearchColumnTypes m_find_combo_columns;
-  Gtk::HPaned m_hpaned;
   Gtk::ScrolledWindow m_matches_window;
-  Gtk::HBox *m_no_matches_box;
+  Gtk::Grid *m_no_matches_box;
   notebooks::NotebooksTreeView *m_notebooksTree;
   sigc::connection m_on_notebook_selection_changed_cid;
   std::set<Tag::Ptr>  m_selected_tags;
