@@ -22,7 +22,7 @@ rm -f $DMG_FILE
 rm -f $DMG_FILE.master
 
 # Compute an approximated image size in MB, and bloat by 15 MB
-image_size=$(du -ck $DMG_APP dmg-data | tail -n1 | cut -f1)
+image_size=$(du -ck $DMG_APP | tail -n1 | cut -f1)
 image_size=$((($image_size + 15000) / 1000))
 
 echo "Creating disk image (${image_size}MB)..."
@@ -39,26 +39,10 @@ cp -r $DMG_APP $MOUNT_POINT
 echo "Detaching from disk image..."
 hdiutil detach $MOUNT_POINT -quiet
 
-rm -rf $DMG_APP
-
-#mv $DMG_FILE $DMG_FILE.master
-
-#echo "Creating distributable image..."
-#hdiutil convert -quiet -format UDBZ -o $DMG_FILE $DMG_FILE.master
-
-#echo "Installing end user license agreement..."
-#hdiutil flatten -quiet $DMG_FILE
-#/Developer/Tools/Rez /Developer/Headers/FlatCarbon/*.r dmg-data/license.r -a -o $DMG_FILE
-#hdiutil unflatten -quiet $DMG_FILE
-
 echo "Converting to final image..."
 hdiutil convert -quiet -format UDBZ -o $DMG_FILE tmp.dmg
 rm tmp.dmg
 
 echo "Done."
-
-#if [ ! "x$1" = "x-m" ]; then
-#	rm $DMG_FILE.master
-#fi
 
 popd &>/dev/null
