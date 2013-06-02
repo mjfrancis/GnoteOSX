@@ -133,6 +133,7 @@ class NoteWindow
   , public EmbeddableWidget
   , public SearchableItem
   , public HasEmbeddableToolbar
+  , public HasActions
 {
 public:
   NoteWindow(Note &);
@@ -154,6 +155,11 @@ public:
   // use co-variant return
   virtual Gtk::Grid *embeddable_toolbar();
 
+  virtual std::vector<Glib::RefPtr<Gtk::Action> > get_widget_actions();
+  virtual sigc::signal<void> & signal_actions_changed();
+  void add_widget_action(const Glib::RefPtr<Gtk::Action> & action, int order);
+  void remove_widget_action(const std::string & name);
+
   void set_size(int width, int height)
     {
       m_width = width;
@@ -171,10 +177,6 @@ public:
   Gtk::ToolButton * delete_button() const
     {
       return m_delete_button;
-    }
-  Gtk::Menu * plugin_menu() const
-    {
-      return m_plugin_menu;
     }
   Gtk::Menu * text_menu() const
     {
@@ -197,7 +199,6 @@ private:
   void update_link_button_sensitivity();
   void on_populate_popup(Gtk::Menu*);
   Gtk::Grid *make_toolbar();
-  Gtk::Menu * make_plugin_menu();
   Gtk::Grid * make_template_bar();
   void on_untemplate_button_click();
   void on_save_size_check_button_toggled();
@@ -226,7 +227,6 @@ private:
   Gtk::ToolButton              *m_pin_button;
   Gtk::ToolButton              *m_link_button;
   NoteTextMenu                 *m_text_menu;
-  Gtk::Menu                    *m_plugin_menu;
   Gtk::TextView                *m_editor;
   Gtk::ScrolledWindow          *m_editor_window;
   NoteFindHandler              m_find_handler;
@@ -238,6 +238,9 @@ private:
 
   utils::GlobalKeybinder       *m_global_keys;
   utils::InterruptableTimeout  *m_mark_set_timeout;
+
+  std::map<int, Glib::RefPtr<Gtk::Action> > m_widget_actions;
+  sigc::signal<void> m_signal_actions_changed;
 
   Tag::Ptr m_template_tag;
   Tag::Ptr m_template_save_size_tag;

@@ -79,12 +79,6 @@ namespace gnote {
 
     m_text_menu = Gtk::manage(new NoteTextMenu(note.get_buffer(), note.get_buffer()->undoer()));
 
-    // Add the Find menu item to the toolbar Text menu.  It
-    // should only show up in the toplevel Text menu, since
-    // the context menu already has a Find submenu.
-
-    m_plugin_menu = manage(make_plugin_menu());
-
     m_embeddable_toolbar = manage(make_toolbar());
 
     m_template_widget = make_template_bar();
@@ -269,6 +263,43 @@ namespace gnote {
     return m_embeddable_toolbar;
   }
 
+  std::vector<Glib::RefPtr<Gtk::Action> > NoteWindow::get_widget_actions()
+  {
+    std::vector<Glib::RefPtr<Gtk::Action> > res;
+    for(std::map<int, Glib::RefPtr<Gtk::Action> >::iterator iter = m_widget_actions.begin();
+        iter != m_widget_actions.end(); ++iter) {
+      res.push_back(iter->second);
+    }
+    return res;
+  }
+
+  sigc::signal<void> & NoteWindow::signal_actions_changed()
+  {
+    return m_signal_actions_changed;
+  }
+
+  void NoteWindow::add_widget_action(const Glib::RefPtr<Gtk::Action> & action, int order)
+  {
+    std::map<int, Glib::RefPtr<Gtk::Action> >::iterator iter = m_widget_actions.find(order);
+    while(iter != m_widget_actions.end()) {
+      iter = m_widget_actions.find(++order);
+    }
+    m_widget_actions[order] = action;
+    m_signal_actions_changed();
+  }
+
+  void NoteWindow::remove_widget_action(const std::string & name)
+  {
+    for(std::map<int, Glib::RefPtr<Gtk::Action> >::iterator iter = m_widget_actions.begin();
+        iter != m_widget_actions.end(); ++iter) {
+      if(iter->second->get_name() == name) {
+        m_widget_actions.erase(iter);
+        break;
+      }
+    }
+    m_signal_actions_changed();
+  }
+
 
     // Delete this Note.
     //
@@ -382,15 +413,6 @@ namespace gnote {
     grid->attach(*text_button, grid_col++, 0, 1, 1);
     text_button->set_tooltip_text(_("Set properties of text"));
 
-    utils::ToolMenuButton *plugin_button = Gtk::manage(
-      new utils::ToolMenuButton(*manage(new Gtk::Image(Gtk::Stock::EXECUTE, icon_size)),
-                                 _("T_ools"),
-                                 m_plugin_menu));
-    plugin_button->set_use_underline(true);
-    plugin_button->show_all();
-    grid->attach(*plugin_button, grid_col++, 0, 1, 1);
-    plugin_button->set_tooltip_text(_("Use tools on this note"));
-
     grid->attach(*manage(new Gtk::SeparatorToolItem()), grid_col++, 0, 1, 1);
 
     m_delete_button = manage(new Gtk::ToolButton(Gtk::Stock::DELETE));
@@ -409,18 +431,6 @@ namespace gnote {
 
     grid->show_all();
     return grid;
-  }
-
-
-  //
-  // This menu can be
-  // populated by individual plugins using
-  // NotePlugin.AddPluginMenuItem().
-  //
-  Gtk::Menu *NoteWindow::make_plugin_menu()
-  {
-    Gtk::Menu *menu = new Gtk::Menu();
-    return menu;
   }
 
 

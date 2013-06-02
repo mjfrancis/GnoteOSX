@@ -1,8 +1,9 @@
 /*
- * "Table of Content" is a Note add-in for Gnote.
- *  It lists Note's table of content in a menu.
+ * "Table of Contents" is a Note add-in for Gnote.
+ *  It lists note's table of contents in a menu.
  *
  * Copyright (C) 2013 Luc Pionchon <pionchon.luc@gmail.com>
+ * Copyright (C) 2013 Aurimas Cernius
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,8 +51,7 @@ TableofcontentModule::TableofcontentModule()
 
 
 TableofcontentNoteAddin::TableofcontentNoteAddin()
-  : m_menu_item      (NULL)
-  , m_toc_menu       (NULL)
+  : m_toc_menu       (NULL)
   , m_toc_menu_built (false)
 {
 }
@@ -81,19 +81,13 @@ Gtk::ImageMenuItem * new_toc_menu_item ()
 
 void TableofcontentNoteAddin::on_note_opened ()
 {
-  // TOC menu
-  m_toc_menu = manage(new Gtk::Menu());
+  m_toc_menu = manage(new Gtk::Menu);
   m_toc_menu->signal_hide().connect(
-                sigc::mem_fun(*this, &TableofcontentNoteAddin::on_menu_hidden));
-  m_toc_menu->show_all ();
+    sigc::mem_fun(*this, &TableofcontentNoteAddin::on_menu_hidden));
 
-  m_menu_item = new_toc_menu_item ();
-  m_menu_item->set_submenu(*m_toc_menu);
-  m_menu_item->signal_activate().connect(
-                 sigc::mem_fun(*this, &TableofcontentNoteAddin::on_menu_item_activated));
-  m_menu_item->show ();
-
-  add_plugin_menu_item (m_menu_item);
+  Glib::RefPtr<Gtk::Action> action = TableofcontentAction::create(
+    sigc::mem_fun(*this, &TableofcontentNoteAddin::update_menu));
+  add_note_action(action, 600);
 
   // Reacts to key press events
   get_note()->get_window()->signal_key_press_event().connect(
@@ -110,17 +104,13 @@ void TableofcontentNoteAddin::on_note_opened ()
 }
 
 
-void TableofcontentNoteAddin::on_menu_item_activated ()
+void TableofcontentNoteAddin::update_menu(Gtk::Menu *menu)
 {
-  if(m_toc_menu_built) {
-    return;
-  }
-  populate_toc_menu (m_toc_menu);
-  m_toc_menu_built = true;
+  populate_toc_menu(menu);
 }
 
 
-void TableofcontentNoteAddin::on_menu_hidden ()
+void TableofcontentNoteAddin::on_menu_hidden()
 {
   m_toc_menu_built = false; //force the submenu to rebuild next time it's supposed to show
 }
@@ -165,13 +155,13 @@ void TableofcontentNoteAddin::populate_toc_menu (Gtk::Menu *toc_menu, bool has_a
       toc_menu->append(*item);
     }
 
-    item = manage(new Gtk::MenuItem (_("Header Level 1")));
+    item = manage(new Gtk::MenuItem (_("Heading 1")));
     item->add_accelerator("activate", get_note()->get_window()->get_accel_group(), GDK_KEY_1, PLATFORM_ACCELERATOR_MASK, Gtk::ACCEL_VISIBLE);
     item->signal_activate().connect(sigc::mem_fun(*this, &TableofcontentNoteAddin::on_level_1_activated));
     item->show ();
     toc_menu->append(*item);
 
-    item = manage(new Gtk::MenuItem (_("Header Level 2")));
+    item = manage(new Gtk::MenuItem (_("Heading 2")));
     item->add_accelerator("activate", get_note()->get_window()->get_accel_group(), GDK_KEY_2, PLATFORM_ACCELERATOR_MASK, Gtk::ACCEL_VISIBLE);
     item->signal_activate().connect(sigc::mem_fun(*this, &TableofcontentNoteAddin::on_level_2_activated));
     item->show ();
@@ -342,17 +332,39 @@ bool TableofcontentNoteAddin::on_key_pressed(GdkEventKey *ev)
 
 
 void TableofcontentNoteAddin::headification_switch (Header::Type header_request)
-//apply the correct header style to the current selection
+//apply the correct header style to the current line(s) including the selection
 //switch:  Level_1 <--> Level_2 <--> text
 {
   Glib::RefPtr<gnote::NoteBuffer> buffer = get_note()->get_buffer();
   Gtk::TextIter start, end;
+  Gtk::TextIter selection_start, selection_end;
+  bool has_selection;
 
-  buffer->get_selection_bounds (start, end);
+  //get selection
+  has_selection = buffer->get_selection_bounds (start, end);
+  selection_start = start;
+  selection_end   = end;
 
+  //grab the complete lines
+  while (start.starts_line() == FALSE) {
+    start.backward_char();
+  }
+  if (end.starts_line() && end != start){ // Home + Shift-down: don't take last line.
+    end.backward_char();
+  }
+  while (end.ends_line() == FALSE) {
+    end.forward_char();
+  }
+
+  //expand the selection to complete lines
+  buffer->select_range (start, end);
+
+  //set the header tags
   Header::Type current_header = get_header_level_for_range (start, end);
 
-  buffer->remove_all_tags (start, end);//reset all tags
+  buffer->remove_tag (m_tag_bold,  start, end);
+  buffer->remove_tag (m_tag_large, start, end);
+  buffer->remove_tag (m_tag_huge,  start, end);
 
   if( current_header == Header::Level_1 && header_request == Header::Level_2) { //existing vs requested
     buffer->set_active_tag ("bold");
@@ -367,6 +379,10 @@ void TableofcontentNoteAddin::headification_switch (Header::Type header_request)
     buffer->set_active_tag ( (header_request == Header::Level_1)?"size:huge":"size:large");
   }
 
+  //restore selection
+  if (has_selection == TRUE) {
+    buffer->select_range (selection_start, selection_end);
+  }
 }
 
 
