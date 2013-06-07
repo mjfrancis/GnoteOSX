@@ -134,7 +134,7 @@ namespace notebooks {
       if(m_note_manager.find(title)) {
         std::list<Note*> tag_notes;
         m_tag->get_notes(tag_notes);
-        title = m_note_manager.get_unique_name (title, tag_notes.size());
+        title = m_note_manager.get_unique_name(title);
       }
       note = m_note_manager.create(title, NoteManager::get_note_template_content (title));
           
@@ -163,7 +163,7 @@ namespace notebooks {
     std::string temp_title;
     Note::Ptr note_template = get_template_note();
 
-    temp_title = m_note_manager.get_unique_name(_("New Note"), m_note_manager.get_notes().size());
+    temp_title = m_note_manager.get_unique_name(_("New Note"));
     Note::Ptr note = m_note_manager.create_note_from_template(temp_title, note_template);
 
     // Add the notebook tag
@@ -214,7 +214,7 @@ namespace notebooks {
 
 
   AllNotesNotebook::AllNotesNotebook(NoteManager & manager)
-    : SpecialNotebook(manager, _("All Notes"))
+    : SpecialNotebook(manager, _("All"))
   {
   }
 
@@ -243,7 +243,7 @@ namespace notebooks {
 
 
   UnfiledNotesNotebook::UnfiledNotesNotebook(NoteManager & manager)
-    : SpecialNotebook(manager, _("Unfiled Notes"))
+    : SpecialNotebook(manager, _("Unfiled"))
   {
   }
 
@@ -272,7 +272,7 @@ namespace notebooks {
 
 
   PinnedNotesNotebook::PinnedNotesNotebook(NoteManager & manager)
-    : SpecialNotebook(manager, _("Pinned Notes"))
+    : SpecialNotebook(manager, _("Important"))
   {
   }
 
@@ -300,7 +300,7 @@ namespace notebooks {
 
 
   ActiveNotesNotebook::ActiveNotesNotebook(NoteManager & manager)
-    : SpecialNotebook(manager, _("Active Notes"))
+    : SpecialNotebook(manager, _("Active"))
   {
     manager.signal_note_deleted
       .connect(sigc::mem_fun(*this, &ActiveNotesNotebook::on_note_deleted));

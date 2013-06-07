@@ -374,7 +374,7 @@ namespace gnote {
   //
   Gtk::Grid *NoteWindow::make_toolbar()
   {
-    Gtk::IconSize icon_size = Gtk::IconSize::from_name(gtk_icon_size_get_name(GTK_ICON_SIZE_MENU));
+    Gtk::IconSize icon_size = Gtk::IconSize::from_name(gtk_icon_size_get_name(GTK_ICON_SIZE_SMALL_TOOLBAR));
 
     Gtk::Grid *grid = manage(new Gtk::Grid);
     int grid_col = 0;
@@ -388,6 +388,7 @@ namespace gnote {
     }
 
     m_pin_button = manage(new Gtk::ToolButton(*m_pin_image, _("Pin")));
+    m_pin_button->set_tooltip_text(_("Mark note as important"));
     m_pin_button->signal_clicked().connect(sigc::mem_fun(*this, &NoteWindow::on_pin_button_clicked));
     grid->attach(*m_pin_button, grid_col++, 0, 1, 1);
     notebooks::NotebookManager::obj().signal_note_pin_status_changed
@@ -865,9 +866,6 @@ namespace gnote {
 
       Gtk::SeparatorMenuItem *spacer1 = manage(new Gtk::SeparatorMenuItem());
 
-      Gtk::MenuItem *font_size = manage(new Gtk::MenuItem(_("Font Size")));
-      font_size->set_sensitive(false);
-
       markup_label(m_normal);
       m_normal.set_active(true);
       m_normal.signal_activate()
@@ -916,7 +914,6 @@ namespace gnote {
       append(m_strikeout);
       append(m_highlight);
       append(*spacer1);
-      append(*font_size);
       append(m_small);
       append(m_normal);
       append(m_large);
